@@ -1,5 +1,12 @@
 version: '3.8'
 services:
+  frontend:
+    container_name: frontend-container
+    build:
+      context: Frontend/web-react
+      dockerfile: ./Dockerfile
+    ports:
+      - 8080:80
   auth-pg-db:
     image: postgres:14.1-alpine
     restart: always

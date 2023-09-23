@@ -1,11 +1,13 @@
 package com.checkmate.authentication.Controller;
 
-import com.checkmate.authentication.Model.LoginForm;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
+
+    @autowired
+    private AuthenticationProfileRepository authenticationRepository;
 
     // Login -> (Refresh Token, Access Token)
     @PostMapping("/login")
