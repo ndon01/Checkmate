@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  auth-pg-db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - auth-pg-db:/var/lib/postgresql/data
+  auth-ms-api:
+    container_name: authenticaiton-api
+    build:
+      context: Backend/Microservices/authentication
+      dockerfile: ./Dockerfile
+    image: users
+    depends_on:
+      - auth-pg-db
+    ports:
+      - 3000:8080
+    environment:
+      DB_HOST: auth-pg-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+    links:
+      - auth-pg-db
+    volumes:
+      - './:/src'
+  users-ms-api:
+    container_name: users-api
+    build:
+      context: Backend/Microservices/users
+      dockerfile: ./Dockerfile
+    image: users
+    ports:
+      - 3001:8080
+    volumes:
+      - './:/src'  
+volumes:
+  auth-pg-db:
+    driver: local
