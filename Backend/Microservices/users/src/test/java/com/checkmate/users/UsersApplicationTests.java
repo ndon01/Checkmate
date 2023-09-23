@@ -1,10 +1,10 @@
-package com.checkmate.authentication;
+package com.checkmate.users;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AuthenticationApplicationTests {
+class UsersApplicationTests {
 
 
 }

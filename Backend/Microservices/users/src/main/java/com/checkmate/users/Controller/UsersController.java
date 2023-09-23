@@ -1,7 +1,6 @@
-package com.checkmate.authentication.Controller;
+package com.checkmate.users.Controller;
 
-import com.checkmate.authentication.Model.LoginForm;
-import com.checkmate.authentication.Model.RegistrationForm;
+import com.checkmate.users.Model.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,9 +19,23 @@ public class UsersController {
             EmailAddress: String,
         }
          */
+        boolean isFormValid = registrationForm.validate();
+        if (!isFormValid) {
+            // Form is not valid
+            System.out.println("Invalid Form");
+
+            for (String s : registrationForm.getErrors()) {
+                System.out.println("INVALID FIELD: " + s);
+            }
+
+            return "";
+        }
+
+        // Form is valid
+
+        System.out.println("Valid Form, Creating User.");
 
         System.out.println(registrationForm);
-        System.out.println(registrationForm.validate() ? "Valid" : "Invalid");
 
         return "";
     }

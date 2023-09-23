@@ -1,4 +1,4 @@
-package com.checkmate.authentication.Model;
+package com.checkmate.users.Model;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
@@ -8,14 +8,20 @@ import org.apache.catalina.util.CharsetMapper;
 import org.apache.coyote.ErrorState;
 import org.apache.tomcat.util.codec.binary.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.cglib.core.Local;
+
 import java.util.ArrayList;
+
+import java.time.LocalDate;
+import java.time.Period;
 
 public class RegistrationForm {
     /*
         {
             Username: String,
             FullName: List<String FirstName, String LastName>
-            DateOfBirth: String,
+            DateOfBirth: String; "MM-DD-YYYY"
             Password: String,
             EmailAddress: String,
         }
@@ -45,7 +51,7 @@ public class RegistrationForm {
     public boolean validate() {
         boolean validity = true;
 
-        // Display Name 
+        // Display Name
         validity &= isDisplayNameValid();
         // Username
         validity &= isUsernameValid();
@@ -115,13 +121,102 @@ public class RegistrationForm {
             return false;
         }
 
-        // Case: 
+        // Case: Regex
 
         return true;
     }
-    
+
     public boolean isDateOfBirthValid() {
+        // Case: DOB is null
         if (DateOfBirth == null) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Case: DOB isnt %2d-%2d-%4d
+        String[] splitDOB = DateOfBirth.split("-");
+        if (splitDOB.length != 3) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Case: Month Out of Bounds
+        String Month = splitDOB[0];
+
+        // Month is Digits
+        if (Month.matches("[^0-9]")) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Month is MM
+        if (Month.length() != 1 && Month.length() != 2) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Month is between 1 and 12
+        int MonthNum = Integer.parseInt(Month);
+        if (MonthNum > 12 || MonthNum < 1) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        ////
+
+        // Case: Day
+        String Day = splitDOB[1];
+
+        // Day is Digits
+        if (Day.matches("[^0-9]")) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Day is DD
+        if (Day.length() != 1 && Day.length() != 2) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Day is between 1 and 31
+        int DayNum = Integer.parseInt(Day);
+        if (DayNum > 31 || DayNum < 1) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Case: Year
+        String Year = splitDOB[2];
+
+        // Day is Digits
+        if (Year.matches("[^0-9]")) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Day is DD
+        if (Year.length() != 4) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+        // Day is between 1 and 31
+        int YearNum = Integer.parseInt(Year);
+        if (YearNum > LocalDate.now().getYear()) {
+            this.ErroredFields.add("DateOfBirth");
+            return false;
+        }
+
+
+        // Case: Must be 13 Years Old or Older
+        LocalDate now = LocalDate.now();
+
+        String formattedDate = String.format("%04d-%02d-%02d", YearNum, MonthNum, DayNum);
+        LocalDate DOBObject = LocalDate.parse(formattedDate);
+        int age = Period.between(DOBObject, now).getYears();
+
+        if (age < 13) {
             this.ErroredFields.add("DateOfBirth");
             return false;
         }
@@ -141,20 +236,23 @@ public class RegistrationForm {
 
     public String[] getErrors() {
 
-        String[] Errors = (String[]) this.ErroredFields.toArray();
+        String[] Errors = new String[this.ErroredFields.size()];
 
+        for (int sidx = 0; sidx < this.ErroredFields.size(); sidx++) {
+            Errors[sidx] = this.ErroredFields.get(sidx);
+        }
 
         return Errors;
     }
 
     public String toString() {
-        return "{" + 
-            "\n\tDisplayName: " + DisplayName + 
-            "\n\tUsername: " + Username + 
-            "\n\tEmailAddress: " + EmailAddress + 
-            "\n\tDateOfBirth: " + DateOfBirth + 
-            "\n\tPassword: " + Password + 
-        "\n}";
+        return "{" +
+                "\n\tDisplayName: " + DisplayName +
+                "\n\tUsername: " + Username +
+                "\n\tEmailAddress: " + EmailAddress +
+                "\n\tDateOfBirth: " + DateOfBirth +
+                "\n\tPassword: " + Password +
+                "\n}";
     }
 
 }
