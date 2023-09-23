@@ -22,7 +22,13 @@ public class AuthenticationController {
          */
 
         System.out.println(registrationForm);
-        System.out.println(registrationForm.validate() ? "Valid" : "Invalid");
+        if ((registrationForm.validate() ? "Valid" : "Invalid") == "Invalid") {
+            String[] e = registrationForm.getErrors();
+
+            for (String s : e) {
+                System.out.println(s);
+            }
+        }
 
         return "";
     }

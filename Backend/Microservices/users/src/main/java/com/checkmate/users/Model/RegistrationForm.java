@@ -8,20 +8,14 @@ import org.apache.catalina.util.CharsetMapper;
 import org.apache.coyote.ErrorState;
 import org.apache.tomcat.util.codec.binary.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.cglib.core.Local;
-
 import java.util.ArrayList;
-
-import java.time.LocalDate;
-import java.time.Period;
 
 public class RegistrationForm {
     /*
         {
             Username: String,
             FullName: List<String FirstName, String LastName>
-            DateOfBirth: String; "MM-DD-YYYY"
+            DateOfBirth: String,
             Password: String,
             EmailAddress: String,
         }
@@ -121,103 +115,13 @@ public class RegistrationForm {
             return false;
         }
 
-        // Case: Regex
-        if (EmailAddress.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            this.ErroredFields.add("EmailAddress");
-            return false;
-        }
+        // Case: 
 
         return true;
     }
-
+    
     public boolean isDateOfBirthValid() {
-        // Case: DOB is null
         if (DateOfBirth == null) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Case: DOB isnt %2d-%2d-%4d
-        String[] splitDOB = DateOfBirth.split("-");
-        if (splitDOB.length != 3) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Case: Month Out of Bounds
-        String Month = splitDOB[0];
-
-        // Month is Digits
-        if (Month.matches("[^0-9]")) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Month is MM
-        if (Month.length() != 1 && Month.length() != 2) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Month is between 1 and 12
-        int MonthNum = Integer.parseInt(Month);
-        if (MonthNum > 12 || MonthNum < 1) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        ////
-
-        // Case: Day
-        String Day = splitDOB[1];
-
-        // Day is Digits
-        if (Day.matches("[^0-9]")) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Day is DD
-        if (Day.length() != 1 && Day.length() != 2) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Day is between 1 and 31
-        int DayNum = Integer.parseInt(Day);
-        if (DayNum > 31 || DayNum < 1) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Case: Year
-        String Year = splitDOB[2];
-
-        // Day is Digits
-        if (Year.matches("[^0-9]")) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Day is DD
-        if (Year.length() != 4) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-        // Day is between 1 and 31
-        int YearNum = Integer.parseInt(Year);
-        if (YearNum > LocalDate.now().getYear()) {
-            this.ErroredFields.add("DateOfBirth");
-            return false;
-        }
-
-
-        // Case: Must be 13 Years Old or Older
-        LocalDate now = LocalDate.now();
-        LocalDate dob = LocalDate.parse(String.format("%04d-%02d-%02d", YearNum, DayNum, MonthNum));
-        System.out.println(Period.between(dob, now).getYears());
-        if (Period.between(dob, now).getYears() < 13) {
             this.ErroredFields.add("DateOfBirth");
             return false;
         }
