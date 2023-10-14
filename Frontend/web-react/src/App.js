@@ -1,10 +1,17 @@
-import ChessBoard from './Components/Chessboard/Chessboard';
+import { BrowserRouter } from "react-router-dom";
+import { UserProvider } from "./Contexts/UserContext";
+import RouteComponent from "./Routes";
+import { ThemeProvider } from "./Contexts/ThemeContext";
 
 function App() {
   return (
-    <div className="App">
-      <ChessBoard/>
-    </div>
+    <ThemeProvider>
+      <BrowserRouter>
+        <UserProvider>
+          <RouteComponent />
+        </UserProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
