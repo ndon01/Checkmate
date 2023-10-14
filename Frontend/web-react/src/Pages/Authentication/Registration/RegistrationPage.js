@@ -3,6 +3,8 @@ import { Button, TextField, Grid, Container, Typography } from "@mui/material";
 import { AccountCircle, LockRounded, EmailRounded } from "@mui/icons-material";
 import NavigationBar from "../../../Components/General/NavigationBar/NavigationBar";
 
+import axios from 'axios'
+
 const RegistrationPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -18,6 +20,14 @@ const RegistrationPage = () => {
       return;
     }
 
+    axios.post("/api/users/register", {
+      "Username": username,
+      "DisplayName": username,
+      "EmailAddress": email,
+      "DateOfBirth": "06-22-2003",
+      "Password": password
+  })
+  
     // Handle registration logic here (e.g., call an API)
     console.log("Username:", username, "Email:", email, "Password:", password);
   };

@@ -1,13 +1,20 @@
-FROM node:18 as builder
+# ---- Base Node ----
+FROM node:18 AS base
 WORKDIR /app
-COPY package.json .
-COPY package-lock.json .
-RUN npm install
+COPY package*.json ./
+
+# ---- Dependencies ----
+FROM base AS dependencies
+RUN npm set progress=false && npm config set depth 0
+RUN npm install --only=production 
 COPY . .
+
+# ---- Test & Build ----
+FROM dependencies AS build
 RUN npm run build
 
-FROM nginx:1.19.0
-WORKDIR /usr/share/nginx/html
-RUN rm -rf ./*
-COPY --from=builder /app/build .
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+# ---- Release ----
+FROM nginx:alpine AS release
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

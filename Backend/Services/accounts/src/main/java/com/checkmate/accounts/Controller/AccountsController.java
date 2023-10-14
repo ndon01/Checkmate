@@ -6,10 +6,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/accounts")
 public class AccountsController {
 
-    @autowired
-    private AuthenticationProfileRepository authenticationRepository;
-
-
     // Register -> (Refresh Token, Access Token)
     @PostMapping("/register")
     public String processRegistration() {

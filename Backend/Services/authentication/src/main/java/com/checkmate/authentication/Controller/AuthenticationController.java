@@ -1,11 +1,11 @@
-package com.checkmate.users.Controller;
+package com.checkmate.authentication.Controller;
 
-import com.checkmate.users.Model.*;
+import com.checkmate.authentication.Model.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/")
-public class UsersController {
+public class AuthenticationController {
 
     // Register -> (Refresh Token, Access Token)
     @PostMapping("/register")

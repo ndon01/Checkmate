@@ -1,52 +1,85 @@
 version: '3.8'
 services:
-  frontend:
-    container_name: frontend-container
-    build:
-      context: Frontend/web-react
-      dockerfile: ./Dockerfile
-    ports:
-      - 8080:80
-  auth-pg-db:
+  authentication-database:
     image: postgres:14.1-alpine
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - '5432:5432'
+      - '5000:5432'
     volumes:
-      - auth-pg-db:/var/lib/postgresql/data
-  auth-ms-api:
-    container_name: authenticaiton-api
+      - authentication-database:/var/lib/postgresql/data
+
+  authentication-service:
+    container_name: authentication-service
     build:
-      context: Backend/Microservices/authentication
+      context: Backend/Services/authentication
       dockerfile: ./Dockerfile
-    image: users
+    image: authentication
     depends_on:
-      - auth-pg-db
+      - authentication-database
     ports:
-      - 3000:8080
+      - 3001:8080
     environment:
-      DB_HOST: auth-pg-db
-      DB_PORT: 5432
+      DB_HOST: authentication-database
+      DB_PORT: 5000
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: postgres
     links:
-      - auth-pg-db
-    volumes:
-      - './:/src'
-  users-ms-api:
-    container_name: users-api
-    build:
-      context: Backend/Microservices/users
-      dockerfile: ./Dockerfile
-    image: users
-    ports:
-      - 3001:8080
+      - authentication-database
     volumes:
       - './:/src'  
+
+  users-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5001:5432'
+    volumes:
+      - users-database:/var/lib/postgresql/data
+
+  users-service:
+    container_name: users-service
+    build:
+      context: Backend/Services/users
+      dockerfile: ./Dockerfile
+    image: users
+    depends_on:
+      - users-database
+    ports:
+      - 3002:8001
+    environment:
+      DB_HOST: users-database
+      DB_PORT: 5001
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+    links:
+      - users-database
+    volumes:
+      - './:/src'  
+
+  frontend:
+    container_name: frontend
+    build:
+      context: Frontend/web-react
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - 3000:8080
+
+  nginx-proxy:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
 volumes:
-  auth-pg-db:
-    driver: local
+  authentication-database:
+  users-database:
