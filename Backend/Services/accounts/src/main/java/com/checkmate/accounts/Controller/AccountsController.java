@@ -1,18 +1,27 @@
-package com.checkmate.authentication.Controller;
+package com.checkmate.accounts.Controller;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
-public class AuthenticationController {
+@RequestMapping("/accounts")
+public class AccountsController {
 
     @autowired
     private AuthenticationProfileRepository authenticationRepository;
 
+
+    // Register -> (Refresh Token, Access Token)
+    @PostMapping("/register")
+    public String processRegistration() {
+        System.out.println("register");
+        return "";
+        
+    }
+
     // Login -> (Refresh Token, Access Token)
     @PostMapping("/login")
-    public String proccessLogin() {
-        System.out.println("Login");
+    public String processLogin() {
+        System.out.println("login");
         return "";
         
     }
