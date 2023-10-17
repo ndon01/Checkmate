@@ -3,7 +3,7 @@ import { Button, TextField, Grid, Container, Typography } from "@mui/material";
 import { AccountCircle, LockRounded, EmailRounded } from "@mui/icons-material";
 import NavigationBar from "../../../Components/General/NavigationBar/NavigationBar";
 
-import axios from 'axios'
+import axios from "axios";
 
 const RegistrationPage = () => {
   const [username, setUsername] = useState("");
@@ -20,14 +20,21 @@ const RegistrationPage = () => {
       return;
     }
 
-    axios.post("/api/users/register", {
-      "Username": username,
-      "DisplayName": username,
-      "EmailAddress": email,
-      "DateOfBirth": "06-22-2003",
-      "Password": password
-  })
-  
+    axios
+      .post("/api/users/register", {
+        Username: username,
+        DisplayName: username,
+        EmailAddress: email,
+        DateOfBirth: "06-22-2003",
+        Password: password,
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     // Handle registration logic here (e.g., call an API)
     console.log("Username:", username, "Email:", email, "Password:", password);
   };
@@ -40,7 +47,7 @@ const RegistrationPage = () => {
       >
         <form onSubmit={handleSubmit}>
           <Typography variant="h5" style={{ margin: "2rem 0" }}>
-            Register
+            Registers
           </Typography>
           <Grid container spacing={1} alignItems="center" marginBottom={"15px"}>
             <Grid item>

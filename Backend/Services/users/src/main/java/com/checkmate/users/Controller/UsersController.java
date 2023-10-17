@@ -33,7 +33,7 @@ public class UsersController {
 
         // Form is valid
 
-        System.out.println("Valid Form, Creating User.");
+        System.out.println("Valid Form: creating User.");
 
         System.out.println(registrationForm);
 

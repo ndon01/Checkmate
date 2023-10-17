@@ -1,10 +1,10 @@
 package com.checkmate.authentication;
 
 
-import com.checkmate.authentication.Controller.AuthenticationController;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.checkmate.authentication.controller.AuthenticationController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 @SpringBootApplication
 public class AuthenticationApplication {

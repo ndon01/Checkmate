@@ -29,48 +29,15 @@ services:
       DB_NAME: postgres
     links:
       - authentication-database
-    volumes:
-      - './:/src'  
 
-  users-database:
-    image: postgres:14.1-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5001:5432'
-    volumes:
-      - users-database:/var/lib/postgresql/data
-
-  users-service:
-    container_name: users-service
-    build:
-      context: Backend/Services/users
-      dockerfile: ./Dockerfile
-    image: users
-    depends_on:
-      - users-database
-    ports:
-      - 3002:8001
-    environment:
-      DB_HOST: users-database
-      DB_PORT: 5001
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
-    links:
-      - users-database
-    volumes:
-      - './:/src'  
 
   frontend:
     container_name: frontend
     build:
       context: Frontend/web-react
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     ports:
-      - 3000:8080
+      - 3000:80
 
   nginx-proxy:
     image: nginx:latest
