@@ -98,7 +98,7 @@ public class AuthService {
             return Optional.empty();
         }
     }
-    
+
     public String generateAuthToken(AuthProfile authProfile) {
         // Here you would typically generate a JWT or another kind of auth token.
         // For simplicity, I'm returning a mock token.
