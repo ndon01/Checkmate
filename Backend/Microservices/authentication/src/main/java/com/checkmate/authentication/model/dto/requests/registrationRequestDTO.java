@@ -11,6 +11,6 @@ public class registrationRequestDTO {
     private String identifier;  // This can be either username or email
     private String password;
 
-    // Default constructor, getters, and setters...
+    // Default constructor, getters, and setters...y
 
 }
