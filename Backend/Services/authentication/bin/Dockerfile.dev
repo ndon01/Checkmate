@@ -1,5 +1,0 @@
-FROM openjdk:21
-WORKDIR /app
-COPY . .
-CMD ["./mvnw", "clean", "spring-boot:run"]
-EXPOSE 8080

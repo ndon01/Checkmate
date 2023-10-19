@@ -2,6 +2,8 @@ package com.checkmate.authentication.service;
 
 import com.checkmate.authentication.model.entity.AuthProfile;
 import com.checkmate.authentication.repository.AuthProfileRepository;
+import com.checkmate.authentication.util.PasswordUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,24 +25,13 @@ public class AuthService {
     @Autowired
     private AuthProfileRepository authProfileRepository;
 
-    public String encryptPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Failed to hash password", e);
-        }
-    }
+    @Autowired
+    private PasswordUtil passwordUtility;
 
-    public boolean matchPassword(String rawPassword, String storedHashedPassword) {
-        String computedHash = encryptPassword(rawPassword);
-        return computedHash.equals(storedHashedPassword);
-    }
     @Transactional
     public AuthProfile register(String username, String password, String email) {
 
-        String hashedPassword = encryptPassword(password);
+        String hashedPassword = passwordUtility.encryptPassword(password);
 
         AuthProfile authProfile = AuthProfile.builder()
                 .username(username)
@@ -60,7 +51,7 @@ public class AuthService {
 
         AuthProfile authProfile = optionalAuthProfile.get();
 
-        if (matchPassword(password, authProfile.getPassword())) {
+        if (passwordUtility.matchPassword(password, authProfile.getPassword())) {
             return Optional.of(authProfile); // password matched
         } else {
             return Optional.empty(); // password didn't match
@@ -92,7 +83,7 @@ public class AuthService {
         }
 
         AuthProfile authProfile = optionalAuthProfile.get();
-        if (matchPassword(password, authProfile.getPassword())) {
+        if (passwordUtility.matchPassword(password, authProfile.getPassword())) {
             return Optional.of(authProfile);
         } else {
             return Optional.empty();

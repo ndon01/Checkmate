@@ -21,7 +21,10 @@ public class AuthenticationController {
     public ResponseEntity<?> register(@RequestBody registrationRequestDTO registrationData) {
         try {
 
-            AuthProfile registeredUser = authService.register()
+            AuthProfile registeredUser = authService.register(
+                    registrationData.getUsername(),
+                    registrationData.getPassword(),
+                    registrationData.getEmail());
             // You can return the AuthProfile entity here, or maybe just a success message.
             // Do not return sensitive information like password hashes.
             return ResponseEntity.ok(registeredUser);

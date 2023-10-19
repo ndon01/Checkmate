@@ -1,16 +1,15 @@
 package com.checkmate.authentication.model.dto.requests;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class registrationRequestDTO {
-    private String identifier;  // This can be either username or email
-    private String password;
-
-    // Default constructor, getters, and setters...y
-
+        private String username;
+        private String password;
+        private String email;
+        private String dateOfBirth; // You can also use LocalDate if you prefer
 }

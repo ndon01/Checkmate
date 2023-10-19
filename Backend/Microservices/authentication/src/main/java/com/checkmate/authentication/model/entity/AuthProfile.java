@@ -1,5 +1,6 @@
 package com.checkmate.authentication.model.entity;
-import org.
+
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -7,12 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @EqualsAndHashCode
 @ToString
+@Table(name = "auth_profiles")
 public class AuthProfile {
 
     @Id
@@ -47,10 +43,10 @@ public class AuthProfile {
     @Column(name = "email_address", nullable = false)
     private String emailAddress;
 
-    @Column(name = "email_address_valid", nullable = false)
+    @Column(name = "email_address_valid")
     private boolean isEmailValid;
 
-    @Column(name = "email_address_validation_token", nullable = false)
+    @Column(name = "email_address_validation_token")
     private String emailAddressValidationToken;
 
     // Date Of Birth
