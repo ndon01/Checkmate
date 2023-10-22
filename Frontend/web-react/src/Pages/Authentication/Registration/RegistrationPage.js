@@ -45,11 +45,11 @@ const RegistrationPage = () => {
       <Container
         style={{ height: "100vh", display: "grid", placeItems: "center" }}
       >
-        <form onSubmit={handleSubmit}>
-          <Typography variant="h5" style={{ margin: "2rem 0" }}>
-            Registers
+        <form onSubmit={handleSubmit} justifyContent="center" alignItems="center">
+          <Typography variant="h5" style={{ margin: "2rem 0", textAlign: "center"}}>
+            Register
           </Typography>
-          <Grid container spacing={1} alignItems="center" marginBottom={"15px"}>
+          <Grid container spacing={1} alignItems="center" justifyContent="center" marginBottom={"15px"}>
             <Grid item>
               <AccountCircle />
             </Grid>
@@ -62,7 +62,7 @@ const RegistrationPage = () => {
               />
             </Grid>
           </Grid>
-          <Grid container spacing={1} alignItems="center" marginBottom={"15px"}>
+          <Grid container spacing={1} alignItems="center" justifyContent="center" marginBottom={"15px"}>
             <Grid item>
               <EmailRounded />
             </Grid>
@@ -76,7 +76,7 @@ const RegistrationPage = () => {
               />
             </Grid>
           </Grid>
-          <Grid container spacing={1} alignItems="center" marginBottom={"15px"}>
+          <Grid container spacing={1} alignItems="center" justifyContent="center" marginBottom={"15px"}>
             <Grid item>
               <LockRounded />
             </Grid>
@@ -90,7 +90,7 @@ const RegistrationPage = () => {
               />
             </Grid>
           </Grid>
-          <Grid container spacing={1} alignItems="center" marginBottom={"15px"}>
+          <Grid container spacing={1} alignItems="center" justifyContent="center" marginBottom={"15px"}>
             <Grid item>
               <LockRounded />
             </Grid>
@@ -104,7 +104,7 @@ const RegistrationPage = () => {
               />
             </Grid>
           </Grid>
-          <Grid container justifyContent="center" style={{ marginTop: "2rem" }}>
+          <Grid container justifyContent="center" alignItems="center" marginTop={"10px"}>
             <Button type="submit" variant="contained" color="primary">
               Register
             </Button>
