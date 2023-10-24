@@ -23,7 +23,6 @@ services:
     volumes:
       - user-database:/var/lib/postgresql/data # Fixed the volume name here
 
-<<<<<<< HEAD
   rabbitmq:
     image: "rabbitmq:management"
     ports:
@@ -33,8 +32,6 @@ services:
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password
 
-=======
->>>>>>> e70aeee91816c80f0a2fb70d2546e3226c19d000
 volumes:
   authentication-database:
   user-database: # Fixed the volume name here
