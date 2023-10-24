@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   authentication-database:
     image: postgres:14.1-alpine
@@ -20,16 +21,17 @@ services:
     ports:
       - '5001:5432'
     volumes:
-      - authentication-database:/var/lib/postgresql/data
+      - user-database:/var/lib/postgresql/data # Fixed the volume name here
 
-  frontend:
-    container_name: frontend
-    build:
-      context: Frontend/web-react
-      dockerfile: ./Dockerfile
+  rabbitmq:
+    image: "rabbitmq:management"
     ports:
-      - 3000:80
+      - "15672:15672" # management UI
+      - "5672:5672"   # default RabbitMQ broker port
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
 
 volumes:
   authentication-database:
-  users-database:
+  user-database: # Fixed the volume name here
