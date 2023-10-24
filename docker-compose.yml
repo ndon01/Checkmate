@@ -22,14 +22,6 @@ services:
     volumes:
       - authentication-database:/var/lib/postgresql/data
 
-  frontend:
-    container_name: frontend
-    build:
-      context: Frontend/web-react
-      dockerfile: ./Dockerfile
-    ports:
-      - 3000:80
-
 volumes:
   authentication-database:
   users-database:
