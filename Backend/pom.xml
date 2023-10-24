@@ -21,6 +21,7 @@
         <!-- add new microservices here -->
         <module>authentication</module>
         <module>users</module>
+        <module>notifications</module>
 
 
         <!-- discover server and api gateway -->
