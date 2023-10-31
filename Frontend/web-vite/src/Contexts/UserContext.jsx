@@ -29,7 +29,7 @@ export const UserProvider = ({ children }) => {
         throw new Error(data.message || 'Registration failed.');
       }
 
-      navigate('/verify')
+      navigate('/login')
 
       return data;
     } catch (error) {

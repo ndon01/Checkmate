@@ -8,6 +8,7 @@ import Styles from './LandingPage.module.css';
 import NavigationBar from '../../../Components/General/NavigationBar/NavigationBar.jsx'
 import { Link } from 'react-router-dom';
 import {blue} from "@mui/material/colors";
+import {FooterArea} from "@/Components/General/FooterArea/index.jsx";
 
 function LandingPage() {
   return (
@@ -18,7 +19,7 @@ function LandingPage() {
         maxWidth="100%"
         style={{
           height:"75vh",
-          position:"absolute",
+          position:"relative",
         }}
     >
       <Box
@@ -47,6 +48,7 @@ function LandingPage() {
         </Box>
       </Box>
     </Container>
+      <FooterArea/>
     </>
   );
 }

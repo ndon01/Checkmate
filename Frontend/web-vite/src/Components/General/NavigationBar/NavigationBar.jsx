@@ -1,116 +1,45 @@
-import React from "react";
-import {
-    AppBar,
-    Toolbar,
-    Typography,
-    Button,
-    IconButton,
-    Paper,
-    Box, useColorScheme,
-} from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import SearchIcon from "@mui/icons-material/Search";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import SettingsIcon from "@mui/icons-material/Settings";
-import { Link } from "react-router-dom";
-import { useUser } from "../../../Contexts/UserContext.jsx";
-import imgUrl from './CheckmateLogo.png';
-function NavigationBar() {
-    const isAuthenticated = false;
-  return (
-    <AppBar position="sticky" >
-      <Box
-        style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "absolute",
-      }}
-      >
-        {/* Logo */}
+import React, { useState, useEffect } from 'react';
+import { AppBar, Toolbar, Typography } from '@mui/material';
+import {Box} from "@mui/system";
+import Authenticated from "@/Components/General/NavigationBar/styles/Authenticated.jsx";
+import Unauthenticated from "@/Components/General/NavigationBar/styles/Unauthenticated.jsx";
 
-        <img
-          src={imgUrl}
-          style={{ width: "50px", height: "50px", transition: "all .3s"}}
-          alt="logo"
-        />
-        
-      </Box>
-      <Toolbar style={{ display: "relative" }}>
-        {/* Left Side */}
-        <Box style={{ height: "100%", position: "relative", left: 0 }}>
-          {isAuthenticated ? (
-            <>
-              <Button color="inherit" component={Link} to="/dashboard">
-                Dashboard
-              </Button>
-              <Button color="inherit" component={Link} to="/play">
-                Play
-              </Button>
-              <Button color="inherit" component={Link} to="/connect">
-                Connect
-              </Button>
-            </>
-          ) : (
-            <Button color="inherit" component={Link} to="/">
-              Home
-            </Button>
-          )}
-        </Box>
+const NavigationBar = () => {
+    const [showBar, setShowBar] = useState(true);
+    const [lastScrollTop, setLastScrollTop] = useState(0);
 
-        <Box
-          style={{
-            height: "100%",
-            width: "max-content",
-            position: "absolute",
-            right: "25px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {/* Right Side */}
-          {isAuthenticated ? (
-            <>
-              <IconButton
-                color="inherit"
-                style={{ width: "24px", height: "24px" }}
-              >
-                <SearchIcon />
-              </IconButton>
-              <IconButton
-                color="inherit"
-                style={{ width: "24px", height: "24px" }}
-              >
-                <NotificationsIcon />
-              </IconButton>
-              <IconButton
-                color="inherit"
-                style={{ width: "24px", height: "24px" }}
-              >
-                <SettingsIcon />
-              </IconButton>
-            </>
-          ) : (
-            <>
-              <Button
-                color="inherit"
-                component={Link}
-                to="/login"
-              >
-                Login
-              </Button>
-              <Button color="inherit" component={Link} to="/register">
-                Register
-              </Button>
-            </>
-          )}
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
-}
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollTop = window.pageYOffset;
+
+            if (currentScrollTop <= 0) {
+                setShowBar(true);
+            } else if (currentScrollTop > lastScrollTop) {
+                // Scrolled down
+                setShowBar(false);
+            } else {
+                // Scrolled up
+                setShowBar(true);
+            }
+
+            setLastScrollTop(currentScrollTop);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [lastScrollTop]);
+
+    return (
+        <>
+        <AppBar position="fixed" style={{ transform: showBar ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+            <Authenticated/>
+        </AppBar>
+        <Box style={{height: "64px"}} />
+    </>
+    );
+};
 
 export default NavigationBar;

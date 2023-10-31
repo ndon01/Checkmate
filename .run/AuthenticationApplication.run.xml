@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AuthenticationApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <module name="authentication" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.checkmate.authentication.AuthenticationApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.checkmate.users.AuthenticationApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
