@@ -122,7 +122,7 @@ public class CredentialsService {
 
 
     private String generateRefreshToken(UserCredentials user) {
-
+        return "";
     }
 
 

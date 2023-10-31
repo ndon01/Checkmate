@@ -21,7 +21,7 @@ export const FriendsArea = () => {
         }
     }
 
-    const friends = new Array(10).fill(0).map(_ => FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)]);
+    const friends = new Array(45).fill(0).map(_ => FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)]);
 
     const handleScroll = () => {
         const scrollContainer = scrollContainerRef.current;
