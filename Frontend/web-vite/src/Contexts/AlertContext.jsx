@@ -48,16 +48,7 @@ export const AlertProvider = ({ children }) => {
                   <Alert
                       variant="outlined"
                       severity={alert.severity}
-                      action={
-                        <IconButton
-                            aria-label="close"
-                            color="inherit"
-                            size="small"
-                            onClick={() => removeAlert(alert.id)}
-                        >
-                          <CloseIcon fontSize="inherit" />
-                        </IconButton>
-                      }
+                      style={{backgroundColor: "white"}}
                   >
                     {alert.message}
                   </Alert>

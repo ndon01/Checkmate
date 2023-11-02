@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import {useNavigate} from "react-router-dom";
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import { useNavigate } from "react-router-dom";
 
 // Create the context
 const UserContext = createContext();
@@ -14,62 +14,80 @@ export const UserProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  const registerUser = async (userData) => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(userData)
-      });
+  useEffect(() => {
+    // Check localStorage for tokens and user context on initial load
+    const storedRefreshToken = localStorage.getItem('refresh_token');
+    const storedAccessToken = localStorage.getItem('access_token');
+    const storedContext = localStorage.getItem('context');
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed.');
+    if (storedRefreshToken && storedAccessToken && storedContext) {
+      setCurrentUser(storedContext);
+      setIsAuthenticated(true);
+    }
+  }, []); // Empty dependency array ensures this useEffect runs once, similar to componentDidMount
+
+
+  const sendRequest = async (url, method = 'GET', body = null, headers = {}) => {
+    let tries = 2; // One try for the original request, another for after refreshing the token
+
+    while (tries--) {
+      const accessToken = localStorage.getItem('access_token');
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
-      navigate('/login')
+      const response = await fetch(url, {
+        method,
+        body,
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers
+        }
+      });
 
-      return data;
-    } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
+      if (response.status !== 401 || !tries) {
+        return response;
+      }
+
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) {
+        return response;
+      }
+
+      const refreshResponse = await fetch("http://localhost:8080/api/auth/refresh", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refresh_token: refreshToken })
+      });
+
+      if (!refreshResponse.ok) {
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('access_token');
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        return refreshResponse;
+      }
+
+      const responseData = await refreshResponse.json();
+      localStorage.setItem('access_token', responseData.accessToken);
     }
   };
 
-  const verifyUser = async (verificationToken) => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ token: verificationToken })
-      });
+  const loginUser = (refresh, access, context) => {
+    localStorage.setItem("refresh_token", refresh)
+    localStorage.setItem("access_token", access)
+    localStorage.setItem("context", context)
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Verification failed.');
-      }
-
-      // Update the user state if needed, based on the verification response
-      // e.g., loginUser(data);
-
-      return data;
-    } catch (error) {
-      console.error("Verification error:", error);
-      throw error;
-    }
-  };
-
-  const loginUser = (userData) => {
-    setCurrentUser(userData);
+    setCurrentUser(context);
     setIsAuthenticated(true);
   };
 
-  
   const logoutUser = () => {
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('context');
     setCurrentUser(null);
     setIsAuthenticated(false);
   };
@@ -79,13 +97,14 @@ export const UserProvider = ({ children }) => {
     isAuthenticated,
     loginUser,
     logoutUser,
-    registerUser,
-    verifyUser
+    sendRequest
   };
 
   return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
+      <UserContext.Provider value={value}>
+        {children}
+      </UserContext.Provider>
   );
 };
+
+export default UserProvider;

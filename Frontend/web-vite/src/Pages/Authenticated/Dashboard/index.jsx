@@ -13,6 +13,10 @@ export const Dashboard = () => {
         <>
             <NavigationBar />
 
+            <div style={{
+                position: "relative",
+                top: "64px"
+            }}>
             {/* Body */}
             <Container style={{
                 margin: "0",
@@ -26,6 +30,7 @@ export const Dashboard = () => {
 
             {/* Footer */}
             <FooterArea />
+            </div>
         </>
     );
 };

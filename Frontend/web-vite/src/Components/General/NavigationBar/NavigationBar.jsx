@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Typography } from '@mui/material';
 import {Box} from "@mui/system";
 import Authenticated from "@/Components/General/NavigationBar/styles/Authenticated.jsx";
 import Unauthenticated from "@/Components/General/NavigationBar/styles/Unauthenticated.jsx";
+import {useUser} from "@/Contexts/UserContext.jsx";
 
 const NavigationBar = () => {
     const [showBar, setShowBar] = useState(true);
@@ -32,13 +33,26 @@ const NavigationBar = () => {
         };
     }, [lastScrollTop]);
 
+    // user context
+    const {
+        currentUser,
+        isAuthenticated,
+        loginUser,
+        logoutUser,
+        sendRequest
+    } = useUser();
+
+
     return (
         <>
-        <AppBar position="fixed" style={{ transform: showBar ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
-            <Authenticated/>
-        </AppBar>
-        <Box style={{height: "64px"}} />
-    </>
+            <AppBar position="fixed" style={{ transform: showBar ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+                {isAuthenticated ? (
+                    <Authenticated/>
+                ) : (
+                    <Unauthenticated/>
+                )}
+            </AppBar>
+        </>
     );
 };
 

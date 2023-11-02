@@ -8,27 +8,49 @@ import VerificationPage from "../Pages/Authentication/Verify/VerificationPage.js
 import {Dashboard} from "../Pages/Authenticated/Dashboard";
 import {Match} from "@/Pages/Match/index.jsx";
 import UserProfile from "@/Pages/Public/UserProfile/index.jsx";
+import { useUser } from "@/Contexts/UserContext.jsx";
+import loginPage from "../Pages/Authentication/Login/LoginPage.jsx";  // import the hook
 
 function RouteComponent() {
-  return (
-    <Routes basename="/">
-        <Route path='/' Component={LandingPage} />
+    const { isAuthenticated } = useUser(); // get the authentication status
 
-        {/* Authentication */}
-        <Route path='/login' Component={LoginPage} />
-        <Route path='/register' Component={RegistrationPage} />
-        <Route path='/verify/:token' Component={VerificationPage} />
+    return (
+        <Routes basename="/">
+            {/* Use conditional rendering for the root route */}
+            {isAuthenticated ? (
+                <>
+                    <Route path='/' element={<Dashboard/>} />
 
-        {/* Authenticated */}
-        <Route path='/dashboard' Component={Dashboard} />
+                    <Route path='/dashboard' element={<Dashboard/>} />
 
-        {/* Match */}
-        <Route path='/match' Component={Match} />
-        <Route path='/profile' Component={UserProfile} />
-        {/* Errors */}
-        <Route path='*' Component={PageNotFound} />
-    </Routes>
-  )
+                    <Route path='/login' element={<Dashboard />} />
+                    <Route path='/register' element={<Dashboard />} />
+                </>
+
+            ) : (
+                <>
+                    <Route path='/' element={<LandingPage/>} />
+
+                    <Route path='/dashboard' element={<LandingPage/>} />
+
+                    <Route path='/login' element={<LoginPage />} />
+                    <Route path='/register' element={<RegistrationPage />} />
+                </>
+            )}
+            {/* Authentication */}
+            <Route path='/verify/:token' element={<VerificationPage />} />
+
+            {/* Authenticated */}
+
+
+            {/* Match */}
+            <Route path='/match' element={<Match />} />
+            <Route path='/profile' element={<UserProfile />} />
+
+            {/* Errors */}
+            <Route path='*' element={<PageNotFound />} />
+        </Routes>
+    )
 }
 
-export default RouteComponent
+export default RouteComponent;

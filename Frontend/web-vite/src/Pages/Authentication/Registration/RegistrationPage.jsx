@@ -248,7 +248,7 @@ const RegistrationPage = () => {
                     </FormControl>
 
                     <Box display="flex" gap={2} style={{marginBlock: '5px'}}>
-                        <FormControl error={showError('month')} required fullWidth style={{marginInlineEnd: "5px"}}>
+                        <FormControl required fullWidth style={{marginInlineEnd: "5px"}}>
                             <InputLabel id="month-select-label">Birth Month</InputLabel>
                             <Select
                                 labelId="month-select-label"
