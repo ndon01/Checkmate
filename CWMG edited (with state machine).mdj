@@ -68,9 +68,9 @@
 																		"$ref": "AAAAAAGLq6qr4XeDdbI="
 																	},
 																	"font": "Arial;13;0",
-																	"left": 32.72998046875,
+																	"left": 30.55908203125,
 																	"top": 13,
-																	"width": 68.90087890625,
+																	"width": 65.63818359375,
 																	"height": 13,
 																	"text": "CWMG 007"
 																},
@@ -83,7 +83,7 @@
 																	"font": "Arial;13;1",
 																	"left": 13,
 																	"top": 13,
-																	"width": 14.72998046875,
+																	"width": 12.55908203125,
 																	"height": 13,
 																	"text": "sd"
 																}
@@ -2509,9 +2509,9 @@
 																		"$ref": "AAAAAAGLrM9gGY1okXc="
 																	},
 																	"font": "Arial;13;0",
-																	"left": 40.72998046875,
+																	"left": 38.55908203125,
 																	"top": 5,
-																	"width": 115.9052734375,
+																	"width": 102.791015625,
 																	"height": 13,
 																	"text": "SequenceDiagram1"
 																},
@@ -2524,7 +2524,7 @@
 																	"font": "Arial;13;1",
 																	"left": 21,
 																	"top": 5,
-																	"width": 14.72998046875,
+																	"width": 12.55908203125,
 																	"height": 13,
 																	"text": "sd"
 																}
@@ -4402,9 +4402,9 @@
 																		"$ref": "AAAAAAGLrNDQXZVenUc="
 																	},
 																	"font": "Arial;13;0",
-																	"left": 32.72998046875,
+																	"left": 30.55908203125,
 																	"top": 5,
-																	"width": 115.9052734375,
+																	"width": 102.791015625,
 																	"height": 13,
 																	"text": "SequenceDiagram1"
 																},
@@ -4417,7 +4417,7 @@
 																	"font": "Arial;13;1",
 																	"left": 13,
 																	"top": 5,
-																	"width": 14.72998046875,
+																	"width": 12.55908203125,
 																	"height": 13,
 																	"text": "sd"
 																}
@@ -5713,9 +5713,9 @@
 																		"$ref": "AAAAAAGLrNmIX6OryMk="
 																	},
 																	"font": "Arial;13;0",
-																	"left": 168.72998046875,
+																	"left": 166.55908203125,
 																	"top": 29,
-																	"width": 97.078125,
+																	"width": 90.54638671875,
 																	"height": 13,
 																	"text": "CWMG-019-Seq"
 																},
@@ -5728,7 +5728,7 @@
 																	"font": "Arial;13;1",
 																	"left": 149,
 																	"top": 29,
-																	"width": 14.72998046875,
+																	"width": 12.55908203125,
 																	"height": 13,
 																	"text": "sd"
 																}
@@ -7117,9 +7117,9 @@
 																		"$ref": "AAAAAAGLrNnthqeV3Q0="
 																	},
 																	"font": "Arial;13;0",
-																	"left": 32.72998046875,
+																	"left": 30.55908203125,
 																	"top": 13,
-																	"width": 73.22998046875,
+																	"width": 69.96728515625,
 																	"height": 13,
 																	"text": "CWMG -012"
 																},
@@ -7132,7 +7132,7 @@
 																	"font": "Arial;13;1",
 																	"left": 13,
 																	"top": 13,
-																	"width": 14.72998046875,
+																	"width": 12.55908203125,
 																	"height": 13,
 																	"text": "sd"
 																}
@@ -8239,9 +8239,9 @@
 																"$ref": "AAAAAAGLrOLMlsNqIkY="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 13,
-															"width": 89.14990234375,
+															"width": 84.0400390625,
 															"height": 13,
 															"text": "Making a Move"
 														},
@@ -8254,7 +8254,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 13,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -10072,9 +10072,9 @@
 																"$ref": "AAAAAAGLrOMv1cVXnvo="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 13,
-															"width": 115.9052734375,
+															"width": 102.791015625,
 															"height": 13,
 															"text": "SequenceDiagram1"
 														},
@@ -10087,7 +10087,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 13,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -11455,9 +11455,9 @@
 																"$ref": "AAAAAAGLrONjBMcqA8w="
 															},
 															"font": "Arial;13;0",
-															"left": 184.72998046875,
+															"left": 182.55908203125,
 															"top": 149,
-															"width": 151.31884765625,
+															"width": 138.9091796875,
 															"height": 13,
 															"text": "Auto Abort Sequence Dia."
 														},
@@ -11470,7 +11470,7 @@
 															"font": "Arial;13;1",
 															"left": 165,
 															"top": 149,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -13130,9 +13130,9 @@
 																"$ref": "AAAAAAGLrON6RMj0bHY="
 															},
 															"font": "Arial;13;0",
-															"left": 304.72998046875,
+															"left": 302.55908203125,
 															"top": 269,
-															"width": 68.90087890625,
+															"width": 65.63818359375,
 															"height": 13,
 															"text": "CWMG 017"
 														},
@@ -13145,7 +13145,7 @@
 															"font": "Arial;13;1",
 															"left": 285,
 															"top": 269,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -14148,9 +14148,9 @@
 																"$ref": "AAAAAAGLrOOLwMpera0="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 13,
-															"width": 172.25341796875,
+															"width": 156.2255859375,
 															"height": 13,
 															"text": "Minigame Sequence Diagram"
 														},
@@ -14163,7 +14163,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 13,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -55922,7 +55922,7 @@
 											"font": "Arial;13;0",
 											"left": 650,
 											"top": 311,
-											"width": 240.3818359375,
+											"width": 239,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLsyLiWOCLLyo="
@@ -56519,7 +56519,7 @@
 											"font": "Arial;13;0",
 											"left": 685.5,
 											"top": 491.5,
-											"width": 218.025390625,
+											"width": 217,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLsyZCduFwd3A="
@@ -56718,7 +56718,7 @@
 											"font": "Arial;13;0",
 											"left": 696.5,
 											"top": 563,
-											"width": 234.630859375,
+											"width": 234,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLsydz1OGoRo4="
@@ -58858,7 +58858,7 @@
 											"font": "Arial;13;0",
 											"left": 492.5,
 											"top": 263,
-											"width": 213.72802734375,
+											"width": 213,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLszQFu+QpF9A="
@@ -59256,7 +59256,7 @@
 											"font": "Arial;13;0",
 											"left": 480,
 											"top": 415,
-											"width": 270.28564453125,
+											"width": 270,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLszYKr+SkQuo="
@@ -59455,7 +59455,7 @@
 											"font": "Arial;13;0",
 											"left": 494.5,
 											"top": 475,
-											"width": 224.0556640625,
+											"width": 223,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLszZNAuTS7N4="
@@ -61223,7 +61223,7 @@
 											"font": "Arial;13;0",
 											"left": 449.5,
 											"top": 91,
-											"width": 276.54443359375,
+											"width": 276,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs0Oexemjcv4="
@@ -61422,7 +61422,7 @@
 											"font": "Arial;13;0",
 											"left": 442,
 											"top": 175,
-											"width": 280.17529296875,
+											"width": 280,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs0RPgOnVCus="
@@ -61621,7 +61621,7 @@
 											"font": "Arial;13;0",
 											"left": 465,
 											"top": 255,
-											"width": 236.1162109375,
+											"width": 235,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs0SXOOoDMP0="
@@ -63025,7 +63025,7 @@
 											"font": "Arial;13;0",
 											"left": 475.5,
 											"top": 99,
-											"width": 169.65625,
+											"width": 168,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs0gDruuQleI="
@@ -63214,7 +63214,7 @@
 											"font": "Arial;13;0",
 											"left": 466,
 											"top": 175,
-											"width": 202.13720703125,
+											"width": 201,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs0hS7uu+pa8="
@@ -64412,7 +64412,7 @@
 											"font": "Arial;13;0",
 											"left": 375.5,
 											"top": 111,
-											"width": 228.1689453125,
+											"width": 227,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLszlMAeXZ8sI="
@@ -64810,7 +64810,7 @@
 											"font": "Arial;13;0",
 											"left": 365.5,
 											"top": 239,
-											"width": 257.75537109375,
+											"width": 257,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLszq7jOa2/tI="
@@ -65009,7 +65009,7 @@
 											"font": "Arial;13;0",
 											"left": 388.5,
 											"top": 303,
-											"width": 214.41357421875,
+											"width": 214,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLszsH9ubkYL8="
@@ -65404,7 +65404,7 @@
 											"font": "Arial;13;0",
 											"left": 382.5,
 											"top": 435,
-											"width": 223.0908203125,
+											"width": 222,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLsz4Jgeej2Co="
@@ -67085,7 +67085,7 @@
 											"font": "Arial;13;0",
 											"left": 422,
 											"top": 167,
-											"width": 298.9580078125,
+											"width": 298,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs152nu9d9Do="
@@ -67276,7 +67276,7 @@
 											"font": "Arial;13;0",
 											"left": 458.5,
 											"top": 239,
-											"width": 242.62255859375,
+											"width": 242,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs18neO+O5oo="
@@ -67470,7 +67470,7 @@
 											"font": "Arial;13;0",
 											"left": 455.5,
 											"top": 303,
-											"width": 266.953125,
+											"width": 266,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAGLs1+Vwu+9jgg="
@@ -75386,9 +75386,9 @@
 																"$ref": "AAAAAAGLs3OTqvNCV3U="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 13,
-															"width": 192.46435546875,
+															"width": 175.7255859375,
 															"height": 13,
 															"text": "CWMG 001 - Sequence DIagram"
 														},
@@ -75401,7 +75401,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 13,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -78906,9 +78906,9 @@
 																"$ref": "AAAAAAGLs5XRew+SfiE="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 13,
-															"width": 192.46435546875,
+															"width": 175.7255859375,
 															"height": 13,
 															"text": "CWMG 002 - Sequence DIagram"
 														},
@@ -78921,7 +78921,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 13,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -81605,9 +81605,9 @@
 																"$ref": "AAAAAAGLs6+4shtHKfk="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 21,
-															"width": 191.74072265625,
+															"width": 175.00830078125,
 															"height": 13,
 															"text": "CWMG 003 - Sequence Diagram"
 														},
@@ -81620,7 +81620,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 21,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -85643,9 +85643,9 @@
 																"$ref": "AAAAAAGLs8WNhiLjUkM="
 															},
 															"font": "Arial;13;0",
-															"left": 24.72998046875,
+															"left": 22.55908203125,
 															"top": 5,
-															"width": 191.74072265625,
+															"width": 175.00830078125,
 															"height": 13,
 															"text": "CWMG 004 - Sequence Diagram"
 														},
@@ -85658,7 +85658,7 @@
 															"font": "Arial;13;1",
 															"left": 5,
 															"top": 5,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
@@ -88066,9 +88066,9 @@
 																"$ref": "AAAAAAGLs9T5WSiG+8Q="
 															},
 															"font": "Arial;13;0",
-															"left": 32.72998046875,
+															"left": 30.55908203125,
 															"top": 13,
-															"width": 191.74072265625,
+															"width": 175.00830078125,
 															"height": 13,
 															"text": "CWMG 005 - Sequence Diagram"
 														},
@@ -88081,7 +88081,7 @@
 															"font": "Arial;13;1",
 															"left": 13,
 															"top": 13,
-															"width": 14.72998046875,
+															"width": 12.55908203125,
 															"height": 13,
 															"text": "sd"
 														}
