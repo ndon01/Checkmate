@@ -16,12 +16,12 @@ public class EmailService {
     @Autowired
     private JavaMailSender emailSender;
 
-    public void sendVerificationEmail(String toEmailAddress, String VerificationCode) {
+    public void sendVerificationEmail(String toEmailAddress, String VerificationCode, String userId) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("mail@playcheckmate.net");
         message.setTo(toEmailAddress);
-        message.setSubject("Verification Code");
-        message.setText("Click the link below to verify:\n\nhttp://localhost:5173/verify/" + VerificationCode + "/");
+        message.setSubject("2FA Verification");
+        message.setText("Click the link below to verify:\n\nhttp://localhost:5173/verify?token=" + VerificationCode + "&userId=" + userId);
         emailSender.send(message);
     }
 }

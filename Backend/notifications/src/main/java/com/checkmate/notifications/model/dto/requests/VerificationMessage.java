@@ -10,6 +10,7 @@ public class VerificationMessage implements Serializable {
 
     private String email;
     private String token;
+    private String userId;
 
     // Getters, setters, and constructors
 }

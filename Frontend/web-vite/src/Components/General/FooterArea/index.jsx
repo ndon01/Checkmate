@@ -14,13 +14,15 @@ export const FooterArea = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            position: "relative",
         }}>
             <Box style={{
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
                 width: "80%",
-                marginBottom: "20px"
+                marginBottom: "50px",
+                paddingBlock: "40px"
             }}>
                 <Box>
                     <Typography variant="h6">Pages</Typography>

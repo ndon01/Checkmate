@@ -1,20 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import {
-  TextField,
-  Box,
-  LinearProgress,
-  Button,
-  FormControl,
-  MenuItem,
-  InputLabel,
-  Select,
-  FormHelperText
+    TextField,
+    Box,
+    LinearProgress,
+    Button,
+    FormControl,
+    MenuItem,
+    InputLabel,
+    Select,
+    FormHelperText, Typography
 } from '@mui/material';
 import NavigationBar from '../../../Components/General/NavigationBar/NavigationBar.jsx';
 import { FooterArea } from '@/Components/General/FooterArea/index.jsx';
 import {Link, useNavigate} from "react-router-dom";
 import {useAlertContext} from "@/Contexts/AlertContext.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
+import {MainArea} from "@/Components/General/MainArea.jsx";
 
 const LoginPage = () => {
 
@@ -93,6 +94,7 @@ const LoginPage = () => {
               }
             }
 
+              createAlert("Login Failed", "error")
 
           } else {
             navigate("/dashboard")
@@ -106,6 +108,8 @@ const LoginPage = () => {
 
 
         } catch (error) {
+            // Handle error as needed
+            createAlert("Login Failed")
           console.error(error)
         }
       }
@@ -113,80 +117,94 @@ const LoginPage = () => {
 
     const showError = (field) => formErrors[field] && formErrors[field] !== '';
 
+    const handleForgotPassword = () => {
+        // Logic to handle password reset
+        navigate("/forgot-password" + (formValues.identifier !== '' ? '?identifier=' + formValues.identifier : '')); // Assuming you'll have a route set up for this
+    };
     return (
         <>
           <NavigationBar/>
-          <Box
-              style={{
-                width: '100vw',
-                height: 'max-content',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingBlock: '150px',
-              }}
-          >
+          <MainArea>
+            <div style={{height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Box
+                    style={{
+                      width: '500px',
+                      maxHeight: 'max-content',
+                      borderRadius: '10px',
+                      boxShadow: '1px 1px 4px 0px black',
+                      backgroundColor: 'white',
+                      padding: '20px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                >
 
-            <Box
-                style={{
-                  width: '500px',
-                  minHeight: 'max-content',
-                  borderRadius: '10px',
-                  boxShadow: '1px 1px 4px 0px black',
-                  backgroundColor: 'white',
-                  padding: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-            >
+                  <Box style={{
+                    width: "100%",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: '20px'
+                  }}>
+                    <h1 style={{
+                      fontSize: "24px",
+                      fontWeight: "400",
+                      fontFamily: "Inter"
+                    }}> Authentication</h1>
+                  </Box>
 
-              <Box style={{
-                width: "100%",
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: '20px'
-              }}>
-                <h1 style={{
-                  fontSize: "24px",
-                  fontWeight: "400",
-                  fontFamily: "Inter"
-                }}>Account Authentication</h1>
-              </Box>
+                  <FormControl fullWidth style={{marginBottom: '5px'}}>
+                    <TextField
+                        required
+                        label="Username or Email"
+                        value={formValues.identifier}
+                        onChange={handleInputChange("identifier")}
+                        helperText={formErrors.identifier}
+                        error={showError("identifier")}
+                    />
+                  </FormControl>
 
-              <FormControl fullWidth style={{marginBottom: '5px'}}>
-                <TextField
-                    required
-                    label="Username or Email"
-                    value={formValues.identifier}
-                    onChange={handleInputChange("identifier")}
-                    helperText={formErrors.identifier}
-                    error={showError("identifier")}
-                />
-              </FormControl>
+                  <FormControl fullWidth style={{marginBlock: '5px'}}>
+                    <TextField
+                        required
+                        label="Password"
+                        type="password"
+                        value={formValues.password}
+                        onChange={handleInputChange("password")}
+                        helperText={formErrors.password}
+                        error={showError("password")}
+                    />
+                      <Typography
+                          variant="body2"
+                          style={{
+                              marginTop: '8px', // Adjust as needed for alignment
+                              cursor: 'pointer',
+                              color: '#1565c0', // Use theme color
+                              textDecoration: 'none',
+                              fontWeight: 'bold'
+                          }}
+                          onClick={handleForgotPassword}
+                      >
+                          Forgot Your Password?
+                      </Typography>
+                  </FormControl>
 
-              <FormControl fullWidth style={{marginBlock: '5px'}}>
-                <TextField
-                    required
-                    label="Password"
-                    type="password"
-                    value={formValues.password}
-                    onChange={handleInputChange("password")}
-                    helperText={formErrors.password}
-                    error={showError("password")}
-                />
-              </FormControl>
+                  <Button variant="contained" color="primary" onClick={handleSubmit} style={{marginTop: '20px'}}>
+                    Login
+                  </Button>
 
-              <Button variant="contained" color="primary" onClick={handleSubmit} style={{marginTop: '20px'}}>
-                Login
-              </Button>
+                  <Button variant="outlined" color="primary" style={{marginTop: '20px'}} component={Link} to='/register'>
+                    Don't have an Account yet?
+                  </Button>
+                </Box>
+                </div>
 
-              <Button variant="outlined" color="primary" style={{marginTop: '20px'}} component={Link} to='/register'>
-                Don't have an Account yet?
-              </Button>
-            </Box>
-          </Box>
-          <FooterArea/>
+              <div style={{width: "100vw", height: "100vh"}}  >
+
+
+              </div>
+          </MainArea>
+
         </>
     );
   };

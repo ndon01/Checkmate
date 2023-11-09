@@ -6,15 +6,16 @@ import {AlertProvider} from "@/Contexts/AlertContext.jsx";
 
 function App() {
     return (
-        <ThemeProvider>
-            <AlertProvider>
-                <BrowserRouter>
-                <UserProvider>
-                    <RouteComponent/>
-                </UserProvider>
-                </BrowserRouter>
-            </AlertProvider>
-        </ThemeProvider>
+
+            <ThemeProvider>
+                <AlertProvider>
+                    <BrowserRouter>
+                    <UserProvider>
+                        <RouteComponent/>
+                    </UserProvider>
+                    </BrowserRouter>
+                </AlertProvider>
+            </ThemeProvider>
     );
 }
 

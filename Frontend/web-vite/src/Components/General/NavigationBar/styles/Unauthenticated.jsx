@@ -33,9 +33,9 @@ function Authenticated() {
 
     return (
         <>
-            <AppBar position="static">
+            <AppBar position="relative">
                 <Toolbar>
-                    <div style={{ textAlign: 'center' }}>
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
                         <img
                             src={imgUrl}
                             style={{ width: "50px", height: "50px" }}
@@ -43,14 +43,20 @@ function Authenticated() {
                         />
                     </div>
 
-                    <div style={{position: "relative", left: "15px"}}>
-                        <Button color="inherit" component={Link} to="/home">
+                    <div style={{position: "relative", left: "15px", height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
+                        <Button color="inherit" component={Link} to="/">
                             Home
+                        </Button>
+                        <Button color="inherit" component={Link} to="/">
+                            About
+                        </Button>
+                        <Button color="inherit" component={Link} to="/search">
+                            Search
                         </Button>
                     </div>
 
 
-                    <div style={{ position: 'absolute', right: '25px' }}>
+                    <div style={{ position: 'absolute', right: '25px', height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
                         <Button color="inherit" component={Link} to="/login">
                             Login
                         </Button>

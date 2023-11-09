@@ -4,35 +4,8 @@ import {Box} from "@mui/system";
 import Authenticated from "@/Components/General/NavigationBar/styles/Authenticated.jsx";
 import Unauthenticated from "@/Components/General/NavigationBar/styles/Unauthenticated.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
-
+import style from './NavStyles.module.css';
 const NavigationBar = () => {
-    const [showBar, setShowBar] = useState(true);
-    const [lastScrollTop, setLastScrollTop] = useState(0);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollTop = window.pageYOffset;
-
-            if (currentScrollTop <= 0) {
-                setShowBar(true);
-            } else if (currentScrollTop > lastScrollTop) {
-                // Scrolled down
-                setShowBar(false);
-            } else {
-                // Scrolled up
-                setShowBar(true);
-            }
-
-            setLastScrollTop(currentScrollTop);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [lastScrollTop]);
-
     // user context
     const {
         currentUser,
@@ -42,16 +15,66 @@ const NavigationBar = () => {
         sendRequest
     } = useUser();
 
+    // states
+    const [showBar, setShowBar] = useState(true);
+    const [hovering, setHovering] = useState(false); // new state to track hovering
+    const [lastScrollTop, setLastScrollTop] = useState(0);
+
+    // useEffect(() => {
+    //     const handleScroll = () => {
+    //         const currentScrollTop = window.scrollY;
+    //         console.log(currentScrollTop)
+    //         if (currentScrollTop > lastScrollTop) {
+    //             if (currentScrollTop - lastScrollTop > 200) {
+    //                 setShowBar(false);
+    //                 setLastScrollTop(currentScrollTop)
+    //             }
+    //         } else {
+    //             setLastScrollTop(currentScrollTop);
+    //             setShowBar(true)
+    //         }
+    //
+    //     };
+    //
+    //     window.addEventListener('scroll', handleScroll);
+    //
+    //     return () => {
+    //         window.removeEventListener('scroll', handleScroll);
+    //     };
+    // }, [lastScrollTop]);
+
+    // const handleMouseEnter = () => {
+    //     setHovering(true);
+    //     setShowBar(true); // Show the navigation bar when the top area is hovered over
+    // };
+    //
+    // const handleMouseLeave = () => {
+    //     setHovering(false); // User is no longer hovering
+    //     // If we're not scrolling up, hide the bar
+    //     if (window.scrollY > lastScrollTop) {
+    //         setShowBar(false);
+    //     }
+    // };
+
+
 
     return (
+
         <>
-            <AppBar position="fixed" style={{ transform: showBar ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+
+            <div style={{
+                position: "fixed",
+                width: "100vw",
+                height: "max-content",
+                transition: 'transform 0.3s ease',
+                zIndex: 100,
+            }}>
                 {isAuthenticated ? (
                     <Authenticated/>
                 ) : (
                     <Unauthenticated/>
                 )}
-            </AppBar>
+            </div>
         </>
     );
 };

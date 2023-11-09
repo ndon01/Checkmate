@@ -18,6 +18,7 @@ public class RabbitMqController {
         System.out.println("Message Recieved");
         System.out.println("Email: " + message.getEmail());
         System.out.println("Token: " + message.getToken());
-        emailService.sendVerificationEmail(message.getEmail(), message.getToken());
+        System.out.println("User ID: " + message.getUserId());
+        emailService.sendVerificationEmail(message.getEmail(), message.getToken(), message.getUserId());
     }
 }

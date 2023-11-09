@@ -5,12 +5,13 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.checkmate.authentication.model.entity.UserCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class TokenUtil {
@@ -23,7 +24,7 @@ public class TokenUtil {
 
     private static final String privateKey = "Authenticaton";
 
-    public DecodedJWT validateToken(String token) {
+    public static DecodedJWT validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(privateKey);
             JWTVerifier verifier = JWT.require(algorithm)
@@ -36,24 +37,50 @@ public class TokenUtil {
         }
     }
 
-    public static String generateRefreshToken(long userId) {
-        Date issueDate = new Date(System.currentTimeMillis());
-        Date expireDate = new Date(issueDate.getTime() + REFRESH_TOKEN_EXPIRY_TIME);
-
+    public static String generateRefreshToken(Date issueDate, Date expireDate, Long userId, List<String> roles, List<String> permissions, String jwtId) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(privateKey);
             return JWT.create()
-                    .withIssuer("AuthService")
+                    .withIssuer(ISSUER)
                     .withSubject(String.valueOf(userId))
                     .withAudience("all")
+
                     .withIssuedAt(issueDate)
                     .withExpiresAt(expireDate)
 
                     .withClaim("userId", userId)
+                    .withClaim("roles", roles)
+                    .withClaim("permissions", permissions)
+
+                    .withJWTId(jwtId)
 
                     .sign(algorithm);
         } catch (Exception e) {
-            logger.error("Error creating refresh Token: {}", e.getMessage());
+            logger.error("Error creating access Token: {}", e.getMessage());
+            throw new RuntimeException("Failed to create token", e);
+        }
+    }
+
+    public static String generateToken(Date issueDate, Date expireDate, Long userId, List<String> roles, List<String> permissions, String jwtId) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(privateKey);
+            return JWT.create()
+                    .withIssuer(ISSUER)
+                    .withSubject(String.valueOf(userId))
+                    .withAudience("all")
+
+                    .withIssuedAt(issueDate)
+                    .withExpiresAt(expireDate)
+
+                    .withClaim("userId", userId)
+                    .withClaim("roles", roles)
+                    .withClaim("permissions", permissions)
+
+                    .withJWTId(jwtId)
+
+                    .sign(algorithm);
+        } catch (Exception e) {
+            logger.error("Error creating access Token: {}", e.getMessage());
             throw new RuntimeException("Failed to create token", e);
         }
     }
@@ -65,7 +92,7 @@ public class TokenUtil {
         try {
             Algorithm algorithm = Algorithm.HMAC256(privateKey);
             return JWT.create()
-                    .withIssuer("AuthService")
+                    .withIssuer(ISSUER)
                     .withSubject(String.valueOf(userId))
                     .withAudience("all")
                     .withIssuedAt(issueDate)
@@ -73,6 +100,31 @@ public class TokenUtil {
 
                     .withClaim("userId", userId)
                     .withClaim("roles", "none")
+
+                    .sign(algorithm);
+        } catch (Exception e) {
+            logger.error("Error creating access Token: {}", e.getMessage());
+            throw new RuntimeException("Failed to create token", e);
+        }
+    }
+
+    public static String generateTFAToken(Long userId, String redirect) {
+        Date issueDate = new Date(System.currentTimeMillis());
+        Date expireDate = new Date(issueDate.getTime() + TimeUnit.MINUTES.toMillis(15));
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(privateKey);
+            return JWT.create()
+                    .withIssuer(ISSUER)
+                    .withSubject(String.valueOf(userId))
+                    .withAudience("all")
+                    .withIssuedAt(issueDate)
+                    .withExpiresAt(expireDate)
+
+                    .withClaim("userId", userId)
+                    .withClaim("roles", "")
+                    .withClaim("type", "TFA")
+                    .withClaim("redirect", redirect)
 
                     .sign(algorithm);
         } catch (Exception e) {

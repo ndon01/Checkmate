@@ -8,11 +8,13 @@ import {
     Menu,
     MenuItem
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import imgUrl from '@/Assets/CheckmateLogo.png';
 import {useUser} from "@/Contexts/UserContext.jsx";
 
 function Authenticated() {
+    const navigate = useNavigate();
+
     const [anchorEl, setAnchorEl] = useState(null);
 
     const handleClick = (event) => {
@@ -33,7 +35,7 @@ function Authenticated() {
 
     return (
         <>
-            <AppBar position="static">
+            <AppBar position="relative">
                 <Toolbar>
                     <div style={{ textAlign: 'center' }}>
                         <img
@@ -50,8 +52,8 @@ function Authenticated() {
                         <Button color="inherit" component={Link} to="/play">
                             Play
                         </Button>
-                        <Button color="inherit" component={Link} to="/connect">
-                            Connect
+                        <Button color="inherit" component={Link} to="/search">
+                            Search
                         </Button>
                     </div>
 
@@ -78,7 +80,9 @@ function Authenticated() {
                             open={Boolean(anchorEl)}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={handleClose}>Settings</MenuItem>
+                            <MenuItem onClick={() => {
+                                navigate('/settings')
+                            }}>Settings</MenuItem>
                             <MenuItem onClick={logoutUser}>Logout</MenuItem>
                         </Menu>
                     </div>

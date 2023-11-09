@@ -38,7 +38,7 @@ export const AlertProvider = ({ children }) => {
           height: "100vh"
         }}>
           <div style={{
-            position: "absolute",
+            position: "fixed",
             top: "64px",
             zIndex: 10,
             width: "100vw"
@@ -56,7 +56,9 @@ export const AlertProvider = ({ children }) => {
             ))}
           </div>
         </div>
+        <div>
         {children}
+        </div>
       </AlertContext.Provider>
   );
 };

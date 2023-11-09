@@ -7,6 +7,8 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    expose:
+      - "5000"
     ports:
       - '5000:5432'
     volumes:
@@ -31,6 +33,8 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+  nginx:
+    image:
 
 volumes:
   authentication-database:

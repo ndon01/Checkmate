@@ -6,6 +6,7 @@ import {WelcomeArea} from "./Sections/WelcomeArea";
 import {FriendsArea} from "./Sections/FriendsArea";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx"
 import {MatchHistoryArea} from "@/Pages/Authenticated/Dashboard/Sections/MatchHistoryArea/index.jsx";
+import {MainArea} from "@/Components/General/MainArea.jsx";
 
 export const Dashboard = () => {
 
@@ -13,10 +14,7 @@ export const Dashboard = () => {
         <>
             <NavigationBar />
 
-            <div style={{
-                position: "relative",
-                top: "64px"
-            }}>
+            <MainArea>
             {/* Body */}
             <Container style={{
                 margin: "0",
@@ -28,9 +26,7 @@ export const Dashboard = () => {
                 <MatchHistoryArea/>
             </Container>
 
-            {/* Footer */}
-            <FooterArea />
-            </div>
+            </MainArea>
         </>
     );
 };

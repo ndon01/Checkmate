@@ -16,6 +16,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import response from "assert";
 import {useAlertContext} from "@/Contexts/AlertContext.jsx";
+import {MainArea} from "@/Components/General/MainArea.jsx";
 
 const RegistrationPage = () => {
 
@@ -130,6 +131,7 @@ const RegistrationPage = () => {
                         let keys = Object.keys(responseData.fields)
                         let values = Object.values(responseData.fields)
 
+
                         for (let i = 0; i < keys.length; i++) {
                             setInputError(keys[i], values[i])
                         }
@@ -187,16 +189,9 @@ const RegistrationPage = () => {
     return (
         <>
             <NavigationBar />
-            <Box
-                style={{
-                    width: '100vw',
-                    height: 'max-content',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    paddingBlock: '100px',
-                }}
-            >
+
+            <MainArea>
+                <div style={{height: "max-content", paddingBlock: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
                 <Box
                     style={{
@@ -336,8 +331,14 @@ const RegistrationPage = () => {
                         Already have an Account?
                     </Button>
                 </Box>
-            </Box>
-            <FooterArea />
+                    </div>
+
+                <div style={{width: "100vw", height: "100vh"}}  >
+
+
+                </div>
+            </MainArea>
+
         </>
     );
 };
