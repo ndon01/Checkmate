@@ -1,4 +1,4 @@
-package com.checkmate.users.model.error;
+package com.checkmate.matches.model.error;
 
 import lombok.Data;
 

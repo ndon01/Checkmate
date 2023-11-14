@@ -25,6 +25,29 @@ services:
     volumes:
       - user-database:/var/lib/postgresql/data # Fixed the volume name here
 
+  matchmaking-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5002:5432'
+    volumes:
+      - matchmaking-database:/var/lib/postgresql/data # Fixed the volume name here
+
+  match-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5003:5432'
+    volumes:
+      - match-database:/var/lib/postgresql/data # Fixed the volume name here
+
+
   rabbitmq:
     image: "rabbitmq:management"
     ports:
@@ -33,8 +56,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
-  nginx:
-    image:
+
 
 volumes:
   authentication-database:

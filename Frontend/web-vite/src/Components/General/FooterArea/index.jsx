@@ -50,9 +50,9 @@ export const FooterArea = () => {
 
                 <Box>
                     <Typography variant="h6">About Us</Typography>
-                    <Link href="#" style={{color: "white", display: "block"}}>Our Story</Link>
-                    <Link href="#" style={{color: "white", display: "block"}}>Team</Link>
-                    <Link href="#" style={{color: "white", display: "block"}}>Careers</Link>
+                    <Link href="/about#OurStory" style={{color: "white", display: "block"}}>Our Story</Link>
+                    <Link href="/about#OurTeam" style={{color: "white", display: "block"}}>Team</Link>
+                    <Link href="/about#Careers" style={{color: "white", display: "block"}}>Careers</Link>
                 </Box>
             </Box>
 

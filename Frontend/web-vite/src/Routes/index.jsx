@@ -15,7 +15,9 @@ import SearchComponent from "@/Pages/Public/SearchPage/SearchPage.jsx";
 import CreateAlert from "@/Private/CreateAlert/index.jsx";
 import ForgotPassword from "@/Pages/Authentication/ForgotPassword";
 import {Settings} from "@/Pages/Authenticated/Settings/index.jsx";
-import ChangePassword from "@/Pages/Authentication/ChangePassword/index.jsx";  // import the hook
+import ChangePassword from "@/Pages/Authentication/ChangePassword/index.jsx";
+import AboutPage from "@/Pages/Public/AboutPage/AboutPage.jsx";
+import {CompleteAccountSetup} from "@/Pages/Authenticated/CompleteAccountSetup/index.jsx";  // import the hook
 
 function RouteComponent() {
     const { isAuthenticated } = useUser(); // get the authentication status
@@ -37,6 +39,8 @@ function RouteComponent() {
                     <Route path='/forgot-password' element={<ForgotPassword />} />
 
                     <Route path='/settings' element={<Settings />} />
+
+                    <Route path='/complete-account-setup' element={<CompleteAccountSetup/>} />
 
                 </>
 
@@ -65,7 +69,7 @@ function RouteComponent() {
             <Route path='/match' element={<Match />} />
             <Route path='/search' element={<SearchComponent />} />
             <Route path='/change-password' element={<ChangePassword/>} />
-
+            <Route path='/about' element={<AboutPage/>} />
 
             {/* Errors */}
             <Route path='*' element={<PageNotFound />} />

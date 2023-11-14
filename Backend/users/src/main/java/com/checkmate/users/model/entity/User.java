@@ -16,5 +16,7 @@ public class User {
     @Column(name = "user_credential_id")
     private Long credentialId;
 
-
+    @OneToOne
+    @JoinColumn(name = "user_profile_id")
+    private UserProfile userProfile;
 }

@@ -23,6 +23,7 @@
         <module>users</module>
         <module>matchmaking</module>
         <module>notifications</module>
+        <module>matches</module>
 
 
         <!-- discover server and api gateway -->
