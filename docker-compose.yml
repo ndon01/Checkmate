@@ -61,3 +61,5 @@ services:
 volumes:
   authentication-database:
   user-database: # Fixed the volume name here
+  matchmaking-database:
+  match-database:
