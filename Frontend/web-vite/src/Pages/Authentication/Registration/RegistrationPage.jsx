@@ -10,12 +10,12 @@ import {
     Select,
     FormHelperText
 } from '@mui/material';
-import NavigationBar from '../../../Components/General/NavigationBar/NavigationBar.jsx';
+import NavigationBar from '../../../Components/NavigationBar/NavigationBar.jsx';
 import { FooterArea } from '@/Components/General/FooterArea/index.jsx';
 import {Link, useNavigate} from "react-router-dom";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import response from "assert";
-import {useAlertContext} from "@/Contexts/AlertContext.jsx";
+import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
 
 const RegistrationPage = () => {

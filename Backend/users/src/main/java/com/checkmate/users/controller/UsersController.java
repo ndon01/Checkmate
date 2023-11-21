@@ -1,8 +1,9 @@
 package com.checkmate.users.controller;
 
-import com.checkmate.users.model.dto.requests.CreateUserRequestDTO;
-import com.checkmate.users.model.dto.responses.CreateUserResponseDTO;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.checkmate.users.model.dto.responses.UserSearchResultDTO;
 import com.checkmate.users.model.entity.User;
+import com.checkmate.users.security.PermissionRequired;
 import com.checkmate.users.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -11,12 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("/api/users")
 public class UsersController {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
     private final UserService userService;
+
 
     public UsersController(UserService userService) {
         this.userService = userService;
@@ -30,21 +34,13 @@ public class UsersController {
         return "API is up and running!";
     }
 
-    @PostMapping("/create-user-profile")
-    public ResponseEntity<CreateUserResponseDTO> createUserProfile(@RequestBody CreateUserRequestDTO body, @RequestHeader("Authorization") String token) {
-        logger.info("Creating user profile for user ID: {}", body.getCredentialsId());
-        logger.info("Request Body: {}", body);
-        logger.info("Token: {}", token);
+    @GetMapping("/user-search")
+    public List<UserSearchResultDTO> searchForUsers(@RequestParam("searchQuery") String searchQuery) {
+        List<User> userList = userService.searchForUser(searchQuery);
 
-        // You would call a service method to handle the creation logic.
-        User user = userService.registerUserProfile(Long.parseLong(body.getCredentialsId()));
+        return userList.stream()
+                .map(user -> new UserSearchResultDTO(user.getUserId(), user.getUsername()))
+                .collect(Collectors.toList());
 
-        // Assuming registerUserProfile would return the created entity or DTO
-        // You would usually return the created object or some acknowledgment of creation
-
-        CreateUserResponseDTO response = new CreateUserResponseDTO();
-        response.setUserId(user.getUserId().toString());
-
-        return ResponseEntity.ok(response);
     }
 }

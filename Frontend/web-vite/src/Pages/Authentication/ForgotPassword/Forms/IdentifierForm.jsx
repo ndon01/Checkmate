@@ -12,10 +12,10 @@ import {
 } from '@mui/material';
 import {FooterArea} from '@/Components/General/FooterArea/index.jsx';
 import {Link, useNavigate} from "react-router-dom";
-import {useAlertContext} from "@/Contexts/AlertContext.jsx";
+import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
-import NavigationBar from "@/Components/General/NavigationBar/NavigationBar.jsx";
+import NavigationBar from "@/Components/NavigationBar/NavigationBar.jsx";
 
 
 const IdentifierForm = ({identifier = '', nextPage = null}) => {

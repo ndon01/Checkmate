@@ -10,10 +10,10 @@ import {
     Select,
     FormHelperText, Typography
 } from '@mui/material';
-import NavigationBar from '../../../Components/General/NavigationBar/NavigationBar.jsx';
+import NavigationBar from '../../../Components/NavigationBar/NavigationBar.jsx';
 import { FooterArea } from '@/Components/General/FooterArea/index.jsx';
 import {Link, useNavigate} from "react-router-dom";
-import {useAlertContext} from "@/Contexts/AlertContext.jsx";
+import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
 
@@ -99,7 +99,7 @@ const LoginPage = () => {
           } else {
             navigate("/dashboard")
             createAlert("Login Successful")
-            loginUser(responseData.refreshToken, responseData.accessToken, {})
+            loginUser(responseData[0], responseData[1])
           }
 
           // Handle the response data as needed
@@ -160,7 +160,6 @@ const LoginPage = () => {
                         value={formValues.identifier}
                         onChange={handleInputChange("identifier")}
                         helperText={formErrors.identifier}
-                        error={showError("identifier")}
                     />
                   </FormControl>
 

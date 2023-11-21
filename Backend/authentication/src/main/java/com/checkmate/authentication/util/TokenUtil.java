@@ -42,9 +42,6 @@ public class TokenUtil {
             Algorithm algorithm = Algorithm.HMAC256(privateKey);
             return JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(String.valueOf(userId))
-                    .withAudience("all")
-
                     .withIssuedAt(issueDate)
                     .withExpiresAt(expireDate)
 

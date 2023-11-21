@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, TextField, Grid, Container, Typography } from "@mui/material";
 import { AccountCircle, LockRounded } from "@mui/icons-material";
-import NavigationBar from "../../../Components/General/NavigationBar/NavigationBar.jsx";
+import NavigationBar from "../../../Components/NavigationBar/NavigationBar.jsx";
 import {WelcomeArea} from "./Sections/WelcomeArea";
 import {FriendsArea} from "./Sections/FriendsArea";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx"

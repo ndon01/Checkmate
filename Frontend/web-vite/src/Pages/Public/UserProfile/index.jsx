@@ -1,5 +1,5 @@
 import React from 'react';
-import NavigationBar from "@/Components/General/NavigationBar/NavigationBar.jsx";
+import NavigationBar from "@/Components/NavigationBar/NavigationBar.jsx";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
 import {Skeleton, Box, Typography, Grid, Button} from "@mui/material";

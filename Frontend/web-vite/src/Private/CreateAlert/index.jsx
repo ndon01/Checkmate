@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Button, TextField, FormControlLabel, Checkbox, Select, MenuItem, InputLabel, FormControl} from "@mui/material";
 import {MainArea} from "@/Components/General/MainArea.jsx";
-import NavigationBar from "@/Components/General/NavigationBar/NavigationBar.jsx";
-import {useAlertContext} from "@/Contexts/AlertContext.jsx";
+import NavigationBar from "@/Components/NavigationBar/NavigationBar.jsx";
+import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 const CreateAlert = () => {
     const {createAlert} = useAlertContext();
     const [message, setMessage] = useState('');

@@ -4,7 +4,7 @@ import {Button} from '@mui/material';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import {Box} from '@mui/system';
-import NavigationBar from '../../../Components/General/NavigationBar/NavigationBar.jsx'
+import NavigationBar from '../../../Components/NavigationBar/NavigationBar.jsx'
 import {Link} from 'react-router-dom';
 import {blue} from "@mui/material/colors";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx";

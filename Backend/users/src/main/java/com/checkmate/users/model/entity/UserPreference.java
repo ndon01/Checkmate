@@ -13,7 +13,7 @@ public class UserPreference {
     @Column(name = "user_preference_id")
     private Long userSettingId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 

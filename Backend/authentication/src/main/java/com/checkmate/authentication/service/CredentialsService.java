@@ -7,6 +7,8 @@ import com.checkmate.authentication.model.UserService.dto.requests.CreateUserReq
 import com.checkmate.authentication.model.UserService.dto.responses.CreateUserResponseDTO;
 import com.checkmate.authentication.model.dto.responses.*;
 import com.checkmate.authentication.model.entity.UserToken;
+import com.checkmate.authentication.model.rabbitmq.UserEventDTO;
+import com.checkmate.authentication.model.rabbitmq.UserEventType;
 import com.checkmate.authentication.model.rabbitmq.VerificationMessage;
 import com.checkmate.authentication.repository.UserCredentialsRepository;
 import com.checkmate.authentication.repository.UserTokensRepository;
@@ -94,39 +96,18 @@ public class CredentialsService {
 
         credentialsRepository.save(newUser); // save the user
 
-        CreateUserRequestDTO createUserRequestDTO = new CreateUserRequestDTO();
-        createUserRequestDTO.setCredentialsId(String.valueOf(newUser.getCredentialId()));
-        createUserRequestDTO.setUsername(username);
-        createUserRequestDTO.setEmailAddress(emailAddress);
-        createUserRequestDTO.setDateOfBirth(dateOfBirth);
+        // broadcast user created
 
+        UserEventDTO userEventDTO = new UserEventDTO();
 
-        // tell the user service
-        System.out.println("Attempting to send message to user-service");
-        CreateUserResponseDTO responseDTO = webClientBuilder
-                .build()
-                .post()
-                .uri("http://USERS-SERVICE/api/users/create-user-profile")
-                .header("Authorization", "Hidf231dfasa")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createUserRequestDTO)
-                .retrieve()
-                .bodyToMono(CreateUserResponseDTO.class)
-                .block();
+        userEventDTO.setUserId(newUser.getCredentialId());
+        userEventDTO.setEventType(UserEventType.USER_REGISTRATION);
 
-        if (responseDTO == null) {
-            System.out.println("Failed to send message to user-service");
-            throw new RuntimeException("Failed to send message to user-service");
-        }
+        userEventDTO.addAdditionalDetails("username", newUser.getUsername());
+        userEventDTO.addAdditionalDetails("emailAddress", newUser.getEmailAddress());
+        userEventDTO.addAdditionalDetails("dateOfBirth", dateOfBirth);
 
-        System.out.println("Sent message to user-service");
-
-        if (!responseDTO.isFailure()) {
-            Long userId = Long.parseLong(responseDTO.getUserId());
-            newUser.setUserId(userId);
-            credentialsRepository.save(newUser); // save the user
-        }
-
+        rabbitTemplate.convertAndSend(RabbitMqConfig.USER_EVENTS_EXCHANGE, "", userEventDTO);
 
         /*
             String tfaCode = generate2FACode(newUser);
@@ -148,77 +129,6 @@ public class CredentialsService {
         }
     }
 
-    // Refresh Token Generation
-    private String generateRefreshToken(UserCredential userCredential) {
-        Date issueDate = new Date(System.currentTimeMillis());
-        Date expireDate = new Date(issueDate.getTime() + REFRESH_TOKEN_EXPIRY_TIME);
-
-        List<String> userRoles = new ArrayList<>();
-        List<String> userPermissions = new ArrayList<>();
-        UUID uuid = UUID.randomUUID();
-
-        userPermissions.add("GENERATE_ACCESS_TOKEN");
-        String refreshToken = TokenUtil.generateToken(issueDate, expireDate, userCredential.getUserId(), userRoles, userPermissions, uuid.toString());
-
-        UserToken userToken = new UserToken();
-        userToken.setCredential(userCredential);
-        userToken.setTokenJwtId(uuid.toString());
-        userToken.setCreatedAt(issueDate);
-        userToken.setExpiresAt(expireDate);
-        userToken.setTokenType(UserToken.TokenType.REFRESH);
-        userToken.setTokenStatus(UserToken.TokenStatus.ACTIVE);
-
-        userTokensRepository.save(userToken);
-
-        return refreshToken;
-    }
-
-    // Access Token Generation
-    private String generateAccessToken(UserCredential userCredential) {
-        Date issueDate = new Date(System.currentTimeMillis());
-        Date expireDate = new Date(issueDate.getTime() + ACCESS_TOKEN_EXPIRY_TIME);
-
-        List<String> userRoles = new ArrayList<>();
-        List<String> userPermissions = new ArrayList<>();
-        UUID uuid = UUID.randomUUID();
-
-        userRoles.add("Basic");
-
-        String accessToken = TokenUtil.generateToken(issueDate, expireDate, userCredential.getUserId(), userRoles, userPermissions, uuid.toString());
-
-        UserToken userToken = new UserToken();
-        userToken.setCredential(userCredential);
-        userToken.setTokenJwtId(uuid.toString());
-        userToken.setCreatedAt(issueDate);
-        userToken.setExpiresAt(expireDate);
-        userToken.setTokenType(UserToken.TokenType.ACCESS);
-        userToken.setTokenStatus(UserToken.TokenStatus.ACTIVE);
-
-        userTokensRepository.save(userToken);
-
-        return accessToken;
-    }
-
-    // Login Methods ( Infront of Refresh Token Generation )
-    public String[] authenticateWithIdentifier(String Identifier, String password) {
-        Optional<UserCredential> optionalUserCredentials = getUserCredentialsFromIdentifier(Identifier);
-
-        if (optionalUserCredentials.isEmpty()) {
-            throw new RuntimeException("Authentication Failure: Invalid Credentials");
-        }
-
-        UserCredential userCredentials = optionalUserCredentials.get();
-        if (!PasswordUtil.matchPassword(password, userCredentials.getPassword())) {
-            throw new RuntimeException("Authentication Failure: Invalid Credentials");
-        }
-
-        // 1) generate refresh token
-        String refreshToken = generateRefreshToken(userCredentials);
-        // 2) generate access token
-        String accessToken = generateAccessToken(userCredentials);
-
-        return new String[] { refreshToken, accessToken };
-    }
 
     // Forgot Password
     public RequestPasswordChangeResponseDTO RequestPasswordChange(String identifier){
@@ -273,7 +183,7 @@ public class CredentialsService {
             throw new RuntimeException("Authentication Failure: Invalid Token.");
         }
 
-        Optional<UserCredential> userCredentialOptional = credentialsRepository.findByUserId(userId);
+        Optional<UserCredential> userCredentialOptional = credentialsRepository.findByCredentialId(userId);
 
         if (userCredentialOptional.isEmpty()) {
             throw new RuntimeException("Authentication Failure: Invalid Token.");
@@ -295,47 +205,6 @@ public class CredentialsService {
         userCredential.setPassword(hashedPassword);
 
         credentialsRepository.save(userCredential); // save the user
-
-        return response;
-    }
-
-  
-    // 2FA
-    public VerificationResponseDTO TFAVerification(String token, String userId) {
-        VerificationResponseDTO response = new VerificationResponseDTO();
-        Optional<UserCredential> optionalAuthProfile = credentialsRepository.findById(Long.parseLong(userId));
-
-        System.out.println("Attempting to verify token");
-
-        System.out.println(token);
-
-        System.out.println(userId);
-
-        if (optionalAuthProfile.isEmpty()) {
-            throw new RuntimeException("Failed to validate Token");
-        }
-        System.out.println("Found user credentials");
-        UserCredential userCredentials = optionalAuthProfile.get();
-
-        // decrypt token
-        DecodedJWT decodedJWT = TokenUtil.validateToken(token);
-        System.out.println(decodedJWT);
-        if (decodedJWT == null) {
-            System.out.println("Failed to validate token");
-            throw new RuntimeException("Failed to validate Token");
-        }
-
-        System.out.println("Decoded token");
-
-        // generate new access token
-        String refreshToken = generateRefreshToken(userCredentials);
-        String accessToken = generateAccessToken(userCredentials);
-
-        response.getFields().put("refreshToken", refreshToken);
-        response.getFields().put("accessToken", accessToken);
-        response.getFields().put("userId", userCredentials.getUserId().toString());
-        response.getFields().put("username", userCredentials.getUsername());
-        response.getFields().put("redirect", decodedJWT.getClaim("redirect").asString());
 
         return response;
     }

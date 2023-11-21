@@ -1,0 +1,51 @@
+.contentContainer {
+    min-height: 150%;
+    padding-inline: 300px;
+}
+
+.mainContentContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.navigationContainer {
+
+}
+
+.pageContainer {
+    width: 100%;
+    border: 1px solid black;
+
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.navigationOptionContainer {
+    background-color: white;
+    padding: 15px;
+    width: 150px;
+    border: 1px solid black;
+    border-bottom: 0;
+    border-right: 0;
+    font-family: Inter;
+}
+
+.navigationOptionContainer:hover {
+    cursor: pointer;
+    background-color: #f2f2f2;
+}
+
+.navOptionTop {
+    border-top-left-radius: 10px;
+}
+
+.navOptionBottom {
+    border-bottom-left-radius: 10px;
+    border-bottom: 1px solid black;
+}
+
+.navOptionSelected {
+    background-color: #f2f2f2;
+    border-right: -3px solid black;
+}

@@ -3,6 +3,9 @@ package com.checkmate.users.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Data
 @Table(name = "users")
@@ -16,7 +19,19 @@ public class User {
     @Column(name = "user_credential_id")
     private Long credentialId;
 
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "display_name")
+    private String displayName;
+
     @OneToOne
     @JoinColumn(name = "user_profile_id")
     private UserProfile userProfile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserPreference> preferences = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserSetting> settings = new HashSet<>();
 }
