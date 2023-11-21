@@ -62,7 +62,7 @@ function RouteComponent() {
             <Route path='/verify' element={<VerificationPage />} />
 
             {/* Authenticated */}
-            <Route path='/profile' element={<UserProfile />} />
+            <Route path='/profile/:userId' element={<UserProfile />} />
 
 
             {/* Match */}
