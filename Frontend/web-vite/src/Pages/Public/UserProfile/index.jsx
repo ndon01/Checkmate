@@ -9,6 +9,21 @@ const UserProfile = () => {
     const params = useParams();
     const { userId } = params;
 
+    const [userData, setUserData] = React.useState({
+        username: 'nick',
+        displayName: 'Nick',
+        biography: '',
+
+        friendCount: 0,
+        followerCount: 0,
+        followingCount: 0,
+
+        isFriend: false,
+        isFollowing: false,
+        isFollower: false,
+        isBlocked: false,
+    });
+
     useEffect(() => {
         // fetch user data
     }, [])
@@ -24,7 +39,7 @@ const UserProfile = () => {
                     padding: '20px',
                 }}>
 
-                    {userId}
+                    {userData.username}
 
                 </Box>
             </MainArea>
