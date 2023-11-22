@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +35,22 @@ public class UsersController {
         return "API is up and running!";
     }
 
-    @GetMapping("/user-search")
+    @GetMapping("/searchForUsers")
     public List<UserSearchResultDTO> searchForUsers(@RequestParam("searchQuery") String searchQuery) {
         List<User> userList = userService.searchForUser(searchQuery);
 
-        return userList.stream()
-                .map(user -> new UserSearchResultDTO(user.getUserId(), user.getUsername()))
-                .collect(Collectors.toList());
+        List<UserSearchResultDTO> userSearchList = new ArrayList<>();
+
+        for (User user : userList) {
+            UserSearchResultDTO thisUser = new UserSearchResultDTO();
+            thisUser.setUserId(user.getUserId());
+            thisUser.setUsername(user.getUsername());
+            thisUser.setDisplayName(user.getDisplayName());
+
+            userSearchList.add(thisUser);
+        }
+
+        return userSearchList;
 
     }
 }

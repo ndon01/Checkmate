@@ -5,9 +5,12 @@ import {MainArea} from "@/Components/General/MainArea.jsx";
 import {Skeleton, Box, Typography, Grid, Button} from "@mui/material";
 import {useParams} from "react-router-dom";
 
+
+import styles from './UserProfile.module.css';
+
 const UserProfile = () => {
     const params = useParams();
-    const { userId } = params;
+    const {userId} = params;
 
     const [userData, setUserData] = React.useState({
         username: 'nick',
@@ -36,14 +39,45 @@ const UserProfile = () => {
                 <Box style={{
                     width: '100vw',
                     height: '100vh',
-                    padding: '20px',
                 }}>
 
-                    {userData.username}
+                    <div className={styles.LandingSection}>
+                        <div className={styles.PFPnNames}>
+                            <div className={styles.ProfilePictureContainer}>
+                                <div className={styles.ProfilePictureContents}>
+                                    <span style={{
+                                        fontSize: '32px',
+                                        fontFamily: 'Inter',
+                                    }}>{userData.username[0].toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div className={styles.NamesContainer}>
+                               <span style={{
+                                   fontSize: '100px',
+                                   fontFamily: 'Inter',
+                                   fontWeight: 'bold'
+                               }}>{userData.displayName}</span>
+                                <span style={{
+                                    fontSize: '46px',
+                                    fontFamily: 'Inter',
+                                }}>@{userData.username}</span>
+                            </div>
+                        </div>
+
+                        <div className={styles.StatsnBtns}>
+                            <div>
+                                stats
+                            </div>
+                            <div>
+                                buttons
+                            </div>
+                        </div>
+
+                    </div>
+
 
                 </Box>
             </MainArea>
-            <FooterArea/>
         </>
     );
 }

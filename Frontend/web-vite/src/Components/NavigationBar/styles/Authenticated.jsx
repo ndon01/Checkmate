@@ -17,6 +17,8 @@ function Authenticated() {
 
     const [anchorEl, setAnchorEl] = useState(null);
 
+
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -72,7 +74,7 @@ function Authenticated() {
                                     top: "1px",
                                     left: ".5px",
                                     fontSize: "18px"
-                                }}>N</span>
+                                }}>{currentUser.username[0].toUpperCase()}</span>
                             </Box>
                         </IconButton>
                         <Menu

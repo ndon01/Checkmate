@@ -5,10 +5,7 @@ import lombok.Data;
 @Data
 public class UserSearchResultDTO {
     private long userId;
+    private String displayName;
     private String username;
 
-    public UserSearchResultDTO(Long userId, String username) {
-        this.userId = userId;
-        this.username = username;
-    }
 }

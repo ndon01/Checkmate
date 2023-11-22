@@ -18,16 +18,12 @@ export const Settings = () => {
             <NavigationBar/>
             <MainArea>
                 <div className={styles.contentContainer}>
-                    <div style={{
-                        paddingBlock: '25px',
-                        width: '182px',
-                        textAlign: 'center'
-                    }}>
+                    <div className={styles.settingsTitle}>
                         <h1 style={{
                             fontSize: '24px',
                             fontWeight: 'bold',
-                            marginBlock: '0px',
-                            fontFamily: 'Inter'
+                            fontFamily: 'Inter',
+                            paddingBlock: '25px'
                         }}>Settings</h1>
                     </div>
                     <div className={styles.mainContentContainer}>

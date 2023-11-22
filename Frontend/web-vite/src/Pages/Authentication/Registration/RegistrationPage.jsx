@@ -53,6 +53,8 @@ const RegistrationPage = () => {
         confirmPassword: '',
     });
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const setInputError = (field, error) => {
         setFormErrors(prevValues => ({
             ...prevValues,
@@ -68,6 +70,7 @@ const RegistrationPage = () => {
     };
 
     const handleSubmit = async () => {
+        setIsSubmitting(true)
         // New form errors object
         const errors = {};
 
@@ -137,6 +140,7 @@ const RegistrationPage = () => {
                         }
                     }
 
+                    setIsSubmitting(false);
 
 
                 } else {
@@ -151,6 +155,8 @@ const RegistrationPage = () => {
             } catch (error) {
                 console.error(error)
             }
+        } else {
+            setIsSubmitting(false);
         }
     };
 
@@ -323,7 +329,7 @@ const RegistrationPage = () => {
                         />
                     </FormControl>
 
-                    <Button variant="contained" color="primary" onClick={handleSubmit} style={{marginTop: '20px'}}>
+                    <Button variant="contained" color="primary" onClick={handleSubmit} style={{marginTop: '20px'}} disabled={isSubmitting}>
                         Register
                     </Button>
 
