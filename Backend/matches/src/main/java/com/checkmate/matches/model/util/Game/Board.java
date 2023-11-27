@@ -5,13 +5,22 @@ import java.util.ArrayList;
 public class Board
 {
     protected static Square[][] myBoard = new Square[8][8];
-
+    protected static String gameId;
 
     public ArrayList<Move> moves = new ArrayList<Move>();
     private String player1, player2;
     private String winnerName;
     protected boolean turn; // true for white, false for black
     private boolean Winner = false;
+
+    public void setGameId(String game)
+    {
+        gameId = game;
+    }
+    public String getGameId()
+    {
+        return gameId;
+    }
 
     public Piece getPiece(int row, int col) {
         return myBoard[row][col].getOccupant();
@@ -61,7 +70,107 @@ public class Board
         }
     }
 
-    public static Square[][] boardMaker(String myString)
+    public String stringMaker()
+    {
+        String newBoard = "";
+        for(int i = 0; i < myBoard.length; i++)
+        {
+
+            for(int j = 0; j < myBoard[i].length; j++)
+            {
+                int counter = 0;
+                if(myBoard[i][j].getOccupant() == null)
+                {
+                    int pos;
+                    counter += 1;
+                    for (int l = j + 1; l < myBoard[i].length; l++)
+                    {
+                        if (myBoard[i][l].getOccupant() == null) {
+                            counter += 1;
+                            j = l;
+                        }
+                        else
+                        {
+                            j = l;
+                            break;
+                        }
+                    }
+
+                    String num = Integer.toString(counter);
+                    System.out.println(num);
+                    newBoard += num;
+                    num = "";
+
+
+                }
+
+
+                else if(myBoard[i][j].getOccupant().pieceType.equalsIgnoreCase("rook"))
+                {
+                    if(myBoard[i][j].getOccupant().isWhite) {
+                        newBoard += "r";
+                    }
+                    else
+                    {
+                        newBoard += "R";
+                    }
+                }
+                else if (myBoard[i][j].getOccupant().pieceType.equalsIgnoreCase("bishop"))
+                {
+                    if(myBoard[i][j].getOccupant().isWhite) {
+                        newBoard += "b";
+                    }
+                    else
+                    {
+                        newBoard += "B";
+                    }
+                }
+                else if (myBoard[i][j].getOccupant().pieceType.equalsIgnoreCase("knight")) {
+                    if(myBoard[i][j].getOccupant().isWhite) {
+                        newBoard += "n";
+                    }
+                    else
+                    {
+                        newBoard += "N";
+                    }
+                }
+                else if (myBoard[i][j].getOccupant().pieceType.equalsIgnoreCase("king")) {
+                    if(myBoard[i][j].getOccupant().isWhite) {
+                        newBoard += "k";
+                    }
+                    else
+                    {
+                        newBoard += "K";
+                    }
+                }
+                else if (myBoard[i][j].getOccupant().pieceType.equalsIgnoreCase("queen")) {
+                    if(myBoard[i][j].getOccupant().isWhite) {
+                        newBoard += "q";
+                    }
+                    else
+                    {
+                        newBoard += "Q";
+                    }
+                }
+                else if (myBoard[i][j].getOccupant().pieceType.equalsIgnoreCase("pawn"))
+                {
+                    if(myBoard[i][j].getOccupant().isWhite) {
+                        newBoard += "p";
+                    }
+                    else
+                    {
+                        newBoard += "P";
+                    }
+                }
+
+
+            }
+            newBoard += "/";
+        }
+        newBoard = newBoard.substring(0,newBoard.length() - 1);
+        return newBoard;
+    }
+    public Square[][] boardMaker(String myString)
     {
 
         int j = 0; //rowws
