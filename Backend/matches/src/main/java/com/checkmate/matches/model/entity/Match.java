@@ -42,9 +42,6 @@ public class Match {
     @Column(name = "current_board")
     private String currentBoard = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
-    @Column(name = "match_moves")
-    private String matchMoves = "";
-
     @Column(name = "isWhiteTurn")
     private boolean isWhiteTurn = true;
 

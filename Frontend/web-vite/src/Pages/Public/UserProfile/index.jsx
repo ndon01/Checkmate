@@ -22,8 +22,9 @@ const UserProfile = () => {
         followerCount: 0,
 
         isFriend: false,
-        isFriendPending: true,
+        isFriendPending: false,
         isFriendRequested: false,
+
         isFollowing: false, // user is following client
         isFollower: false, // client is following user
 
