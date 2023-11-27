@@ -52,6 +52,34 @@ public class MatchService {
         matchRepository.save(newMatch);
     }
 
+    public boolean resignRequest(long userId)
+    {
+        Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
+        if(optionalMatch.isEmpty())
+        {
+            return false;
+        }
+
+        Match thisMatch = optionalMatch.get();
+        boolean isWhite;
+        long otherUser;
+        if(thisMatch.getBlackUserId() == userId)
+        {
+            isWhite = false;
+            otherUser = thisMatch.getWhiteUserId();
+        }
+        else
+        {
+            isWhite = true;
+            otherUser = thisMatch.getBlackUserId();
+        }
+
+        thisMatch.setForfeited(true);
+        thisMatch.setWinnerUserId(otherUser);
+        matchRepository.saveAndFlush(thisMatch);
+        return true;
+    }
+
     public boolean drawResponse(long userId, boolean response)
     {
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
