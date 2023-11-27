@@ -24,11 +24,20 @@ public class Match {
     @Column(name = "is_draw")
     private boolean isDraw = false;
 
+    @Column(name = "draw_requested")
+    private boolean resignRequested = false;
+
+    @Column(name = "draw_requester_id")
+    private Long drawRequesterId = null;
+
     @Column(name = "is_abandoned")
     private boolean isAbandoned = false;
 
     @Column(name = "is_forfeited")
     private boolean isForfeited = false;
+
+    @Column(name ="match_moves")
+    private String matchMoves = "";
 
     @Column(name = "current_board")
     private String currentBoard = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";

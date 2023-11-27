@@ -46,13 +46,45 @@ public class MatchController {
 
     @PostMapping("/makeMove")
     @RequiresJWT
-    public void makeMove(HttpServletRequest request)
+    public ResponseEntity<?> makeMove(HttpServletRequest request)
     {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
 
-        matchService.makeMove(decodedJWT.getClaim("userId").asLong());
+
+        return ResponseEntity.ok("Move made.");
 
     }
+
+    @PostMapping("/forfeitMatch")
+    @RequiresJWT
+    public ResponseEntity<?> forfeitMatch(HttpServletRequest request)
+    {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        return ResponseEntity.ok("Match forfeited.");
+
+    }
+
+    @PostMapping("/requestDraw")
+    @RequiresJWT
+    public ResponseEntity<?> requestDraw(HttpServletRequest request)
+    {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        return ResponseEntity.ok("Draw request response received.");
+
+    }
+
+    @PostMapping("/respondToDrawRequest")
+    @RequiresJWT
+    public ResponseEntity<?> respondToDrawRequest(HttpServletRequest request)
+    {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        return ResponseEntity.ok("Draw request response received.");
+
+    }
+
 
 
 
