@@ -60,6 +60,7 @@ public class Match {
     private Long winnerUserId;
 
     @Column(name = "last_move_time")
+
     private Long lastMoveTime;
 
     @Column(name = "white_time_left_seconds")
