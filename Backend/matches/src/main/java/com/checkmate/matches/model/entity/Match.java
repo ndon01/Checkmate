@@ -25,7 +25,7 @@ public class Match {
     private boolean isDraw = false;
 
     @Column(name = "draw_requested")
-    private boolean resignRequested = false;
+    private boolean drawRequested = false;
 
     @Column(name = "draw_requester_id")
     private Long drawRequesterId = null;

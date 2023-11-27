@@ -17,16 +17,22 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id1", nullable = false)
-    private Long userId1;
+    @Column(name = "requester_id", nullable = false)
+    private Long requesterId; // the user who sent the friend request
 
-    @Column(name = "user_id2", nullable = false)
-    private Long userId2;
+    @Column(name = "reciever_id", nullable = false)
+    private Long receiverId; // the user who received the friend request
+
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatus status = FriendshipStatus.PENDING;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    public enum FriendshipStatus {
+        PENDING,
+        FRIENDS
+    }
 }
