@@ -3,8 +3,10 @@ package com.checkmate.users.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.checkmate.users.model.dto.requests.ChangeDisplayNameRequestDTO;
 import com.checkmate.users.model.dto.responses.UserContextResponseDTO;
+import com.checkmate.users.model.entity.Following;
 import com.checkmate.users.model.entity.Friendship;
 import com.checkmate.users.model.entity.User;
+import com.checkmate.users.repository.FollowingRepository;
 import com.checkmate.users.repository.FriendshipRepository;
 import com.checkmate.users.repository.UserRepository;
 import com.checkmate.users.security.PermissionRequired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/relationship")
 public class RelationshipController {
 
     @Autowired
@@ -25,6 +28,9 @@ public class RelationshipController {
 
     @Autowired
     private FriendshipRepository friendshipRepository;
+
+    @Autowired
+    private FollowingRepository followingRepository;
 
     @PostMapping("/sendFriendRequest")
     @RequiresJWT
@@ -89,6 +95,7 @@ public class RelationshipController {
     @RequiresJWT
     public ResponseEntity<?> cancelFriendRequest(@RequestParam("userId") long userId, HttpServletRequest request) {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+        Long requesterId = decodedJWT.getClaim("userId").asLong();
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).build();
@@ -102,13 +109,40 @@ public class RelationshipController {
 
         User user = optionalUser.get();
 
-        return ResponseEntity.ok().build();
+        // Check if user is already friends with the user
+        Friendship requesterToRequested = friendshipRepository.findByUserId1AndUserId2(requesterId, userId);
+        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requesterId);
+
+        // Friendship request exists from requested to requester
+        if (requestedToRequester != null) {
+            // cannot cancel a friend request that you didn't send
+            if (requestedToRequester.getStatus() == Friendship.FriendshipStatus.PENDING) {
+                return ResponseEntity.status(400).body("You did not send a friend request to this user");
+            } else {
+                return ResponseEntity.status(400).body("You are already friends with this user");
+            }
+        }
+
+        // Friendship request exists from requester to requested
+        if (requesterToRequested != null) {
+            // Friendship request is pending, cancel the request
+            if (requestedToRequester.getStatus() == Friendship.FriendshipStatus.PENDING) {
+                friendshipRepository.delete(requestedToRequester);
+                return ResponseEntity.ok().body("Friend request cancelled");
+            } else {
+                return ResponseEntity.status(400).body("You are already friends with this user");
+            }
+        }
+
+        // Friendship request does not exist
+        return ResponseEntity.status(400).body("You did not send a friend request to this user");
     }
 
     @PostMapping("/acceptFriendRequest")
     @RequiresJWT
     public ResponseEntity<?> acceptFriendRequest(@RequestParam("userId") long userId, HttpServletRequest request) {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+        Long requestedId = decodedJWT.getClaim("userId").asLong();
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).build();
@@ -122,13 +156,32 @@ public class RelationshipController {
 
         User user = optionalUser.get();
 
-        return ResponseEntity.ok().build();
+        // Check if user is already friends with the user
+        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requestedId);
+
+        if (requestedToRequester == null) {
+            return ResponseEntity.status(400).body("You did not receive a friend request from this user");
+        }
+
+        // Friendship request exists from requested to requester, check if it's pending
+        if (requestedToRequester.getStatus() == Friendship.FriendshipStatus.PENDING) {
+            // Friendship request is pending, accept the request
+            requestedToRequester.setStatus(Friendship.FriendshipStatus.FRIENDS);
+
+            friendshipRepository.save(requestedToRequester);
+
+            return ResponseEntity.ok().body("Friend request accepted");
+        }
+
+        return ResponseEntity.status(400).body("You are already friends with this user");
+
     }
 
     @PostMapping("/denyFriendRequest")
     @RequiresJWT
     public ResponseEntity<?> denyFriendRequest(@RequestParam("userId") long userId, HttpServletRequest request) {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+        Long requestedId = decodedJWT.getClaim("userId").asLong();
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).build();
@@ -142,7 +195,22 @@ public class RelationshipController {
 
         User user = optionalUser.get();
 
-        return ResponseEntity.ok().build();
+        // Check if user is already friends with the user
+        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requestedId);
+
+        if (requestedToRequester == null) {
+            return ResponseEntity.status(400).body("You did not receive a friend request from this user");
+        }
+
+        // Friendship request exists from requested to requester, check if it's pending
+        if (requestedToRequester.getStatus() == Friendship.FriendshipStatus.PENDING) {
+            // Friendship request is pending, delete the request
+            friendshipRepository.delete(requestedToRequester);
+            return ResponseEntity.ok().body("Friend request denied");
+        }
+
+        return ResponseEntity.status(400).body("You are already friends with this user");
+
     }
 
     @PostMapping("/unfriendUser")
@@ -162,13 +230,42 @@ public class RelationshipController {
 
         User user = optionalUser.get();
 
-        return ResponseEntity.ok().build();
+        // Check if user is already friends with the user
+        Friendship requesterToRequested = friendshipRepository.findByUserId1AndUserId2(user.getUserId(), userId);
+        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, user.getUserId());
+
+        // Friendship request exists from requested to requester
+        if (requestedToRequester != null) {
+            // Friendship request is friended, delete the request
+            if (requestedToRequester.getStatus() == Friendship.FriendshipStatus.FRIENDS) {
+                friendshipRepository.delete(requestedToRequester);
+                return ResponseEntity.ok().body("Unfriended user");
+            } else {
+                return ResponseEntity.status(400).body("You are not friends with this user");
+            }
+        }
+
+        // Friendship request exists from requester to requested
+        if (requesterToRequested != null) {
+            // Friendship request is friended, delete the request
+            if (requesterToRequested.getStatus() == Friendship.FriendshipStatus.FRIENDS) {
+                friendshipRepository.delete(requesterToRequested);
+                return ResponseEntity.ok().body("Unfriended user");
+            } else {
+                return ResponseEntity.status(400).body("You are not friends with this user");
+            }
+        }
+
+        // Friendship request does not exist
+        return ResponseEntity.status(400).body("You are not friends with this user");
     }
 
     @PostMapping("/followUser")
     @RequiresJWT
+    @Transactional
     public ResponseEntity<?> followUser(@RequestParam("userId") long userId, HttpServletRequest request) {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+        Long followerId = decodedJWT.getClaim("userId").asLong();
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).build();
@@ -182,13 +279,28 @@ public class RelationshipController {
 
         User user = optionalUser.get();
 
-        return ResponseEntity.ok().build();
+        // Check if user is already following the user
+        Following following = followingRepository.findByFollowerIdAndFollowingId(followerId, userId);
+
+        if (following != null) {
+            return ResponseEntity.status(400).body("You are already following this user");
+        }
+
+        // If not, follow the user
+        Following newFollowing = new Following();
+        newFollowing.setFollowerId(followerId);
+        newFollowing.setFollowingId(userId);
+
+        followingRepository.save(newFollowing);
+
+        return ResponseEntity.ok().body("Followed user");
     }
 
     @PostMapping("/unfollowUser")
     @RequiresJWT
     public ResponseEntity<?> unfollowUser(@RequestParam("userId") long userId, HttpServletRequest request) {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+        Long followerId = decodedJWT.getClaim("userId").asLong();
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).build();
@@ -203,16 +315,16 @@ public class RelationshipController {
         User followedUser = optionalUser.get();
 
         // Check if user is already following the user
+        Following following = followingRepository.findByFollowerIdAndFollowingId(followerId, userId);
 
+        if (following == null) {
+            return ResponseEntity.status(400).body("You are not following this user");
+        }
 
+        // If not, unfollow the user
+        followingRepository.delete(following);
 
-        // If not, return 400
-
-        // If so, unfollow the user
-
-
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("Unfollowed user");
     }
 
 
