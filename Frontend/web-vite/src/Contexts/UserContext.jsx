@@ -122,6 +122,45 @@ export const UserProvider = ({children}) => {
     }, []); // Empty dependency array ensures this useEffect runs once, similar to componentDidMount
 
 
+    /*
+        Send Request Method
+        - Sends a request and if the response is not ok, it will try to refresh the access token
+        - If the access token is refreshed, it will retry the request
+        - If the access token is not refreshed, it will log the user out
+        - If the response is ok, it will return the response
+     */
+    const sendRequest = async (url, options) => {
+        fetch(url, options).then(async (response) => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    const refreshResponse = await fetch("http://localhost:8080/api/auth/refresh", {
+                        method: "GET",
+                        headers: {
+                            'Authorization': 'Refresh ' + localStorage.getItem('refresh_token')
+                        }
+                    });
+
+                    if (!refreshResponse.ok) {
+                        logoutUser();
+                        createAlert("Session Error, Please Log In Again", "error");
+                    } else {
+                        const responseData = await refreshResponse.json();
+                        loginUser(responseData.refreshToken, responseData.accessToken)
+                        return sendRequest(url, options);
+                    }
+                } else {
+                    createAlert("Session Error, Please Log In Again", "error");
+                    logoutUser();
+                }
+            } else {
+                return response;
+            }
+        })
+    }
+
+
+
+
     const loginUser = (refresh, access) => {
         localStorage.setItem("refresh_token", refresh)
         localStorage.setItem("access_token", access)
@@ -139,7 +178,19 @@ export const UserProvider = ({children}) => {
         createAlert("Successfully Logged Out")
     };
 
+    useEffect(() => {
+        localStorage.setItem("context", JSON.stringify(currentUser));
+
+        return () => {
+
+        };
+    }, [currentUser]);
+
+
     const value = {
+        setCurrentUser,
+        checkContextValidity,
+        sendRequest,
         currentUser,
         isAuthenticated,
         loginUser,

@@ -109,7 +109,7 @@ const LoginPage = () => {
 
         } catch (error) {
             // Handle error as needed
-            createAlert("Login Failed")
+            createAlert("Login Failed", "error")
           console.error(error)
         }
       }

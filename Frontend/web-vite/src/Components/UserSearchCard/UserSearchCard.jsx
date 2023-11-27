@@ -12,6 +12,7 @@ export const UserSearchCard = ({userId, username, displayName}) => {
                 width: '90%',
                 minHeight: 'max-content',
                 padding: '10px',
+                paddingBlock: '20px',
 
                 borderRadius: '10px',
                 backgroundColor: 'white',

@@ -2,7 +2,7 @@ import React from 'react';
 import { IconButton } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 
-const SettingsField = ({ label, value }) => {
+const SettingsField = ({ label, value, onClick}) => {
     return (
         <div style={{
             width: '100%',
@@ -16,7 +16,7 @@ const SettingsField = ({ label, value }) => {
                 <span style={{ fontFamily: "Inter", fontSize: '24px' }}>
                     {label}: <span style={{ fontWeight: 'bold' }}>{value}</span>
                 </span>
-                <IconButton style={{ marginLeft: '0px' }}>
+                <IconButton style={{ marginLeft: '0px' }} onClick={onClick}>
                     <Edit />
                 </IconButton>
             </div>

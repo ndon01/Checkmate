@@ -20,7 +20,7 @@ export const AlertProvider = ({ children }) => {
     }, 500); // Match this with the animation duration in CSS
   }
 
-  const createAlert = (message, severity = 'success', duration = 15000) => {
+  const createAlert = (message, severity = 'success', duration = 5000) => {
     const id = new Date().getTime();
     setAlerts((prevAlerts) => [...prevAlerts, { id, message, severity, removing: false }]);
     setTimeout(() => {

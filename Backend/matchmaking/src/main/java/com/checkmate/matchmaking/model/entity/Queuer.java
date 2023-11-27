@@ -26,14 +26,14 @@ public class Queuer {
     @Column(name = "in_queue")
     private boolean inQueue = false;
 
+    @Column(name = "last_ping")
+    private String lastPing = String.valueOf(System.currentTimeMillis());
+
+    @Column(name = "in_match")
+    private boolean inMatch = false;
+
+
     @Column(name = "elo")
     private int elo = 1800;
-
-    @Column(name = "match_requested")
-    private boolean matchRequested = false;
-
-    @Column(name = "match_accepted")
-    private boolean match_accepted = false;
-
 
 }

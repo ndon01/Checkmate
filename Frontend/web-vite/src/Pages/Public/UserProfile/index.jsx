@@ -14,17 +14,19 @@ const UserProfile = () => {
 
     const [userData, setUserData] = React.useState({
         username: 'nick',
-        displayName: 'Nick',
+        displayName: 'Nicholas Donahue',
         biography: '',
 
         friendCount: 0,
-        followerCount: 0,
         followingCount: 0,
+        followerCount: 0,
 
         isFriend: false,
-        isFollowing: false,
-        isFollower: false,
-        isBlocked: false,
+        isFriendPending: true,
+        isFriendRequested: false,
+        isFollowing: false, // user is following client
+        isFollower: false, // client is following user
+
     });
 
     useEffect(() => {
@@ -41,40 +43,170 @@ const UserProfile = () => {
                     height: '100vh',
                 }}>
 
-                    <div className={styles.LandingSection}>
-                        <div className={styles.PFPnNames}>
-                            <div className={styles.ProfilePictureContainer}>
-                                <div className={styles.ProfilePictureContents}>
-                                    <span style={{
-                                        fontSize: '32px',
-                                        fontFamily: 'Inter',
-                                    }}>{userData.username[0].toUpperCase()}</span>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                        <div style={{
+                            marginTop: '25px'
+                        }}>
+                            <Skeleton variant="circular" width={150} height={150}/>
+                        </div>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            marginTop: '25px'
+                        }}>
+                            <Typography variant="h4">
+                                {userData.displayName}
+                            </Typography>
+                            <Typography variant="h6" style={{
+                                color: 'gray',
+                            }}>
+                                @{userData.username}
+                            </Typography>
+                        </div>
+
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginTop: '25px',
+                            backgroundColor: 'lightgray',
+                            borderRadius: '25px',
+                            padding: '25px'
+                        }}>
+                            {/* Friends */}
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                marginRight: '25px'
+                            }}>
+                                <div>
+                                    <Typography variant="h6">
+                                        {userData.friendCount}
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="h5" fontWeight={"bolder"}>
+                                        Friends
+                                    </Typography>
                                 </div>
                             </div>
-                            <div className={styles.NamesContainer}>
-                               <span style={{
-                                   fontSize: '100px',
-                                   fontFamily: 'Inter',
-                                   fontWeight: 'bold'
-                               }}>{userData.displayName}</span>
-                                <span style={{
-                                    fontSize: '46px',
-                                    fontFamily: 'Inter',
-                                }}>@{userData.username}</span>
+
+                            {/* Following */}
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}>
+                                <div>
+                                    <Typography variant="h6">
+                                        {userData.friendCount}
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="h5" fontWeight={"bolder"}>
+                                        Following
+                                    </Typography>
+                                </div>
+                            </div>
+
+                            {/* Followers */}
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                marginLeft: '25px'
+                            }}>
+                                <div>
+                                    <Typography variant="h6">
+                                        {userData.friendCount}
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="h5" fontWeight={"bolder"}>
+                                        Followers
+                                    </Typography>
+                                </div>
                             </div>
                         </div>
 
-                        <div className={styles.StatsnBtns}>
-                            <div>
-                                stats
-                            </div>
-                            <div>
-                                buttons
-                            </div>
-                        </div>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginTop: '25px',
+                            backgroundColor: 'lightgray',
+                            borderRadius: '25px',
+                            padding: '25px'
+                        }}>
+                            {/* Friend Buttons */}
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                marginRight: '25px'
+                            }}>
+                                { userData.isFriendPending && (
+                                    <>
+                                    <Button variant="contained" style={{
+                                        backgroundColor: 'green',
+                                    }}>
+                                        Accept Friend Request
+                                    </Button>
 
+                                    <Button variant="contained" style={{
+                                        backgroundColor: 'red',
+                                        marginTop: '10px'
+                                    }}>
+                                        Deny Friend Request
+                                    </Button>
+                                    </>
+                                )}
+
+                                {userData.isFriendRequested && (
+                                    <Button variant="contained" color="primary">
+                                        Cancel Request
+                                    </Button>
+                                )}
+
+                                {userData.isFriend && (
+                                    <Button variant="contained" color="primary">
+                                        Remove Friend
+                                    </Button>
+                                )}
+
+                                {(!userData.isFriend && !userData.isFriendPending && !userData.isFriendRequested) && (
+                                    <Button variant="contained" color="primary">
+                                        Add Friend
+                                    </Button>
+                                )}
+
+                            </div>
+
+                            {/* Following Buttons */}
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}>
+                                {userData.isFollower ? (
+                                    <Button variant="contained" color="primary">
+                                        Unfollow
+                                    </Button>
+                                ) : (
+                                    <Button variant="contained" color="primary">
+                                        Follow
+                                    </Button>
+                                )}
+                            </div>
+
+                        </div>
                     </div>
-
 
                 </Box>
             </MainArea>

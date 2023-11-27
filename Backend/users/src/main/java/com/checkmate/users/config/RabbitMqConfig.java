@@ -12,12 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMqConfig {
 
-    public static final String USER_EVENTS_QUEUE = "user_events_queue";
+    public static final String USERS_USER_EVENTS_QUEUE = "users_user_events_queue";
     public static final String USER_EVENTS_EXCHANGE = "user_events_exchange";
 
     @Bean
     Queue queue() {
-        return new Queue(USER_EVENTS_QUEUE, true);
+        return new Queue(USERS_USER_EVENTS_QUEUE, true);
     }
 
     @Bean

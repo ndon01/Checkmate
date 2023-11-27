@@ -15,7 +15,7 @@ public interface QueuerRepository extends JpaRepository<Queuer, Long> {
     Optional<Queuer> getQueuerByUserId(long userId);
 
 
-    @Query(value = "SELECT * FROM queuers WHERE in_queue = true AND match_requested = false AND elo BETWEEN :minElo AND :maxElo and user_id != :currentUserId LIMIT 1",
+    @Query(value = "SELECT * FROM queuers WHERE in_queue = true AND elo BETWEEN :minElo AND :maxElo and user_id != :currentUserId LIMIT 1",
             nativeQuery = true)
     Queuer findOpponent(@Param("currentUserId") Long currentUserId, @Param("minElo") int minElo, @Param("maxElo") int maxElo);
 }

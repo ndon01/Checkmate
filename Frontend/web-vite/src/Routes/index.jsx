@@ -66,7 +66,7 @@ function RouteComponent() {
 
 
             {/* Match */}
-            <Route path='/match' element={<Match />} />
+            <Route path='/match/:matchId' element={<Match />} />
             <Route path='/search' element={<SearchComponent />} />
             <Route path='/change-password' element={<ChangePassword/>} />
             <Route path='/about' element={<AboutPage/>} />

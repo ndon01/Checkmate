@@ -34,8 +34,8 @@ public class RouteLocatorConfiguration {
 
                 // Match Service
                 .route(p -> p
-                        .path("/api/match/**")
-                        .filters(f -> f.rewritePath("/api/match/(?<remaining>.*)", "/${remaining}"))
+                        .path("/api/matches/**")
+                        .filters(f -> f.rewritePath("/api/matches/(?<remaining>.*)", "/${remaining}"))
                         .uri("lb://MATCH-SERVICE")
                 )
                 .build();

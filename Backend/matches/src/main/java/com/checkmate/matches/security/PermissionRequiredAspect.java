@@ -1,8 +1,7 @@
-package com.checkmate.users.config;
+package com.checkmate.matches.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.checkmate.users.security.PermissionRequired;
-import com.checkmate.users.util.TokenUtil;
+import com.checkmate.matches.util.TokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -18,8 +19,16 @@ import java.util.Arrays;
 @Component
 public class PermissionRequiredAspect {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(PermissionRequiredAspect.class);
+
     @Around("@annotation(permissionRequired)")
     public Object validateRole(ProceedingJoinPoint joinPoint, PermissionRequired permissionRequired) throws Throwable {
+
+        logger.info("permissionRequired invoked...");
+
+
+        System.out.println("Validating roles...");
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String authorization = request.getHeader("Authorization");
 
