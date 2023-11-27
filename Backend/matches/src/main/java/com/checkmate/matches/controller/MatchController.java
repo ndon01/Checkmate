@@ -1,11 +1,14 @@
 package com.checkmate.matches.controller;
 
+import com.checkmate.matches.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.checkmate.matches.model.dto.requests.createMatchRequestDTO;
 import com.checkmate.matches.model.entity.Match;
 import com.checkmate.matches.repository.MatchRepository;
 import com.checkmate.matches.security.PermissionRequired;
 import com.checkmate.matches.security.RequiresJWT;
+import com.checkmate.matches.service.MatchService;
+import com.netflix.discovery.converters.Auto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,8 @@ public class MatchController {
 
     @Autowired
     private MatchRepository matchRepository;
+    @Autowired
+    private MatchService matchService;
 
     @GetMapping("/getCurrentMatch")
     @RequiresJWT
@@ -35,9 +40,18 @@ public class MatchController {
         }
 
 
-
         System.out.println(decodedJWT.getClaim("userId").asLong());
         return ResponseEntity.ok("Match details...");
+    }
+
+    @PostMapping("/makeMove")
+    @RequiresJWT
+    public void makeMove(HttpServletRequest request)
+    {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        matchService.makeMove(decodedJWT.getClaim("userId").asLong());
+
     }
 
 
