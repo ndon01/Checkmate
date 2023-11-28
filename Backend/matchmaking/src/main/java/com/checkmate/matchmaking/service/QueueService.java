@@ -33,7 +33,7 @@ public class QueueService {
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
     }
 
-    private Queuer getQueuerByUserId(long userId) {
+    public Queuer getQueuerByUserId(long userId) {
         Optional<Queuer> queuerOptional = queuerRepository.getQueuerByUserId(userId);
 
         return queuerOptional.orElse(null);
@@ -80,12 +80,8 @@ public class QueueService {
         opponent.setInMatch(true);
 
         // save and flush so no new matches are made for these users
-        queuerRepository.saveAllAndFlush(new ArrayList<Queuer>(){
-            {
-                add(searchingFor);
-                add(opponent);
-            }
-        });
+        queuerRepository.saveAndFlush(searchingFor);
+        queuerRepository.saveAndFlush(opponent);
 
         MatchEventDTO matchmakingEventDTO = new MatchEventDTO();
 

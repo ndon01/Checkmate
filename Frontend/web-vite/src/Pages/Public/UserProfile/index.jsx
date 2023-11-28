@@ -140,6 +140,8 @@ const UserProfile = () => {
                 setUserData({
                     ...userData,
                     requestingFriendship: false,
+                    friends: false,
+                    friendRequestSent: false,
                     friendCount: userData.friendCount - 1,
                 })
             } else {
@@ -210,8 +212,6 @@ const UserProfile = () => {
                     width: '100vw',
                     height: '100vh',
                 }}>
-
-                    {JSON.stringify(userData)}
 
                     <div style={{
                         display: 'flex',
@@ -326,29 +326,33 @@ const UserProfile = () => {
                                 { userData.requestingFriendship && (
                                     <>
                                     <Button variant="contained" style={{
-                                        backgroundColor: 'green',
+                                        backgroundColor: 'rgb(118,220,147)',
                                     }} onClick={acceptFriendRequest}>
                                         Accept Friend Request
                                     </Button>
 
                                     <Button variant="contained" style={{
-                                        backgroundColor: 'red',
+                                        backgroundColor: 'rgb(239,33,74)',
                                         marginTop: '10px'
-                                    }} onClick={denyFriendRequest}>
+                                    }} onClick={cancelFriendRequest}>
                                         Deny Friend Request
                                     </Button>
                                     </>
                                 )}
 
                                 {userData.friendRequestSent && (
-                                    <Button variant="contained" color="primary" onClick={cancelFriendRequest}>
+                                    <Button variant="contained" onClick={cancelFriendRequest} style={{
+                                        backgroundColor: 'grey'
+                                    }}>
                                         Cancel Request
                                     </Button>
                                 )}
 
                                 {userData.friends && (
-                                    <Button variant="contained" color="primary" onClick={removeFriend}>
-                                        Remove Friend
+                                    <Button variant="contained" onClick={removeFriend} style={{
+                                        backgroundColor: 'rgb(239,33,74)',
+                                    }}>
+                                        Unfriend
                                     </Button>
                                 )}
 
@@ -367,7 +371,9 @@ const UserProfile = () => {
                                 alignItems: 'center',
                             }}>
                                 {userData.following ? (
-                                    <Button variant="contained" color="primary" onClick={unfollowUser}>
+                                    <Button variant="contained" onClick={unfollowUser} style={{
+                                        backgroundColor: 'rgb(239,33,74)',
+                                    }}>
                                         Unfollow
                                     </Button>
                                 ) : (

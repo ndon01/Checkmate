@@ -17,9 +17,22 @@ public class RabbitMqConfig {
 
     public static final String MATCH_EVENT_EXCHANGE = "match_event_exchange";
 
+    public static final String MATCHMAKING_MATCH_EVENT_QUEUE = "matches_match_event_queue";
+
+
+    @Bean
+    Queue matchmakingMatchEventQueue() {
+        return new Queue(MATCHMAKING_MATCH_EVENT_QUEUE, false, false, true);
+    }
+
     @Bean
     FanoutExchange matchEventExchange() {
         return new FanoutExchange(MATCH_EVENT_EXCHANGE);
+    }
+
+    @Bean
+    Binding bindingMatchEvent(Queue matchmakingMatchEventQueue, FanoutExchange matchEventExchange) {
+        return BindingBuilder.bind(matchmakingMatchEventQueue).to(matchEventExchange);
     }
 
     public static final String MATCHMAKING_MICROSERVICE_QUEUE = UUID.randomUUID().toString();

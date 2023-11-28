@@ -14,9 +14,10 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     Optional<Match> findMatchByBlackUserId(Long blackUserId);
     Optional<Match> findMatchByWhiteUserId(Long whiteUserId);
 
-    @Query(value = "SELECT * FROM matches WHERE (white_user_id = :userId OR black_user_id = :userId) AND is_finished = false;",
+    @Query(value = "SELECT * FROM matches WHERE (white_user_id = :userId OR black_user_id = :userId) AND (match_status = 'PENDING' OR match_status = 'PROGRESS')",
             nativeQuery = true)
     Optional<Match> findActiveMatchByUserId(@Param("userId") Long userId);
+
 
     @Query(value = "SELECT * FROM matches WHERE (white_user_id = :userId OR black_user_id = :userId)",
             nativeQuery = true)

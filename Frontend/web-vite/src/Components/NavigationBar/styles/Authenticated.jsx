@@ -83,9 +83,22 @@ function Authenticated() {
                             onClose={handleClose}
                         >
                             <MenuItem onClick={() => {
+                                navigate('/profile/' + currentUser.userId)
+                            }}>Profile</MenuItem>
+
+                            <MenuItem onClick={() => {
+                                navigate('/relationships')
+                            }}>Relationships</MenuItem>
+
+                            <MenuItem onClick={() => {
                                 navigate('/settings')
                             }}>Settings</MenuItem>
-                            <MenuItem onClick={logoutUser}>Logout</MenuItem>
+
+                            <MenuItem onClick={() => {
+                                logoutUser()
+                                navigate('/')
+
+                            }}>Logout</MenuItem>
                         </Menu>
                     </div>
                 </Toolbar>

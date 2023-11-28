@@ -36,6 +36,7 @@ public class Match {
     @Column(name = "is_forfeited")
     private boolean isForfeited = false;
 
+
     @Column(name ="match_moves")
     private String matchMoves = "";
 
@@ -55,6 +56,12 @@ public class Match {
 
     @Column(name = "black_user_id")
     private Long blackUserId;
+
+    @Column(name = "last_white_ping")
+    private Long lastWhitePing;
+
+    @Column(name = "last_black_ping")
+    private Long lastBlackPing;
 
     @Column(name = "winner_user_id")
     private Long winnerUserId;

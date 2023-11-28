@@ -36,7 +36,7 @@ export const UserProvider = ({children}) => {
                 let minutes = Math.floor(diff / 60000);
                 let days = Math.floor(minutes / 1440);
 
-                if (days >= 13 || !hasAccessToken) {
+                if (minutes >= 10) {
                     useRefreshToken = true;
                 }
             } else {
@@ -116,9 +116,37 @@ export const UserProvider = ({children}) => {
         }
     };
 
+    function refreshAccessToken() {
+        const storedRefreshToken = localStorage.getItem('refresh_token');
+        fetch("http://localhost:8080/api/auth/refresh", {
+            method: "GET",
+            headers: {
+                Authorization: "Refresh " + storedRefreshToken
+            }
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(data => {
+                    localStorage.setItem("refresh_token", data.refreshToken)
+                    localStorage.setItem("access_token", data.accessToken);
+                    localStorage.setItem("lastRefresh", new Date().getTime());
+                    localStorage.setItem("lastAccess", new Date().getTime());
+
+                    localStorage.removeItem("context");
+                    checkContextValidity();
+                });
+            } else {
+                logoutUser();
+            }
+        })
+    }
+
     useEffect(() => {
         // Immediately invoke the async function
-        checkContextValidity();
+        refreshAccessToken();
+
+        setInterval(() => {
+            refreshAccessToken();
+        }, 60000);
     }, []); // Empty dependency array ensures this useEffect runs once, similar to componentDidMount
 
 
@@ -180,11 +208,14 @@ export const UserProvider = ({children}) => {
 
     useEffect(() => {
         localStorage.setItem("context", JSON.stringify(currentUser));
-
-        return () => {
-
-        };
     }, [currentUser]);
+
+    useEffect(() => {
+        // refresh token
+        const interval = setInterval(() => {
+            checkContextValidity();
+        }, 720000)
+    }, []);
 
 
     const value = {

@@ -3,12 +3,15 @@ import {Button, TextField, Grid, Container, Typography, IconButton} from "@mui/m
 import {Box} from "@mui/system";
 import styles from './index.module.css';
 import {ArrowBack, ArrowForward} from "@mui/icons-material";
+import {useNavigate} from "react-router-dom";
 
 const FAKE_NAMES = ["John Doe", "Jane Smith", "Alice", "Bob", "Charlie", "David", "Ella", "Frank", "Grace", "Hannah"];
 
 export const FriendsArea = () => {
     const scrollContainerRef = useRef(null);
     const [scrollPosition, setScrollPosition] = useState("Start");
+    const navigate = useNavigate();
+
     const scrollLeft = () => {
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollBy({left: -150, behavior: 'smooth'});
@@ -21,7 +24,30 @@ export const FriendsArea = () => {
         }
     }
 
-    const friends = new Array(45).fill(0).map(_ => FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)]);
+    const [friends, setFriends] = useState([]);
+
+    function fetchFriends() {
+        fetch('http://localhost:8080/api/users/relationship/getFriends', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            }
+        }).then((response) => {
+            if (response.status === 200) {
+                response.json().then((data) => {
+                    setFriends(data);
+                })
+            }
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
+    useEffect(() => {
+        // fetch friends
+        fetchFriends();
+    }, []);
 
     const handleScroll = () => {
         const scrollContainer = scrollContainerRef.current;
@@ -74,42 +100,99 @@ export const FriendsArea = () => {
                             {/* Body */}
                             <Box className={styles.FriendCardsContainer} ref={scrollContainerRef}
                                  onScroll={handleScroll}>
-                                {friends.map((name, index) => (
-                                    <Box key={index} style={{
-                                        width: "max-content",
-                                        height: "150px",
-                                        marginInline: "10px",
-                                        paddingInline: "5px",
-                                        paddingBlock: "5px",
-                                        backgroundColor: "white",
-                                        borderRadius: "10px",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        boxShadow: "1px 1px 4px 1px rgba(0,0,0, .5)"
-                                    }}>
-                                        <Box style={{
-                                            width: "100px",
-                                            height: "100px",
-                                            borderRadius: "100%",
-                                            backgroundColor: "grey"
+                                {friends.map((friend, key) => {
+                                    return (
+                                        <div style={{
+                                            backgroundColor: 'white',
+                                            paddingTop: '25px',
+                                            paddingBottom: '25px',
+                                            borderRadius: '10px',
+                                            boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
+                                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                                            paddingInline: '25px',
+                                            maxWidth: '250px',
+                                        }} key={key}>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                flexDirection: 'row',
+                                            }}>
+                                                <div style={{
+                                                    border: '1px solid black',
+                                                    borderRadius: '100%',
+                                                    width: '100px',
+                                                    height: '100px',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                }}>
+
+                                        <span style={{
+                                            fontSize: '24px',
+                                            fontWeight: 'bolder',
+                                            fontFamily: 'Inter',
                                         }}>
-                                            <Box style={{
-                                                width: "25px",
-                                                height: "25px",
-                                                borderRadius: "100%",
-                                                backgroundColor: "#30A72D",
-                                                position: "relative",
-                                                top: "70px",
-                                                left: "65px",
-                                            }}/>
-                                        </Box>
-                                        <Typography style={{
-                                            marginTop: "7.5px"
-                                        }}>{name}</Typography>
-                                    </Box>
-                                ))}
+                                            {friend.username.substring(0, 1).toUpperCase()}
+                                        </span>
+
+                                                </div>
+                                            </div>
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+
+                                                paddingTop: '10px'
+                                            }}>
+                                    <span style={{
+                                        fontSize: '24px',
+                                        fontWeight: 'bold',
+                                        fontFamily: 'Inter',
+                                    }}>
+                                        {friend.displayName}
+                                    </span>
+
+                                                <span style={{
+                                                    fontSize: '12px',
+                                                    fontWeight: 'bold',
+                                                    fontFamily: 'Inter',
+                                                    paddingTop: '5px',
+                                                    color: 'rgba(0, 0, 0, 0.5)'
+
+                                                }}>
+                                        @{friend.username}
+                                    </span>
+                                            </div>
+                                            <div style={{
+                                                paddingTop: '25px',
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                            }}>
+                                                <Button variant={'contained'} style={{
+                                                    backgroundColor: 'rgb(118,220,147)',
+                                                }}>
+                                                    Challenge
+                                                </Button>
+
+                                            </div>
+                                            <div style={{
+                                                marginTop: '10px',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                            }}>
+                                                <Button variant={'contained'} onClick={() => {
+                                                    navigate('/profile/' + friend.userId);
+                                                }}>
+                                                    View Profile
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </Box>
 
                             {/* Right Scroll Button */}
@@ -134,7 +217,12 @@ export const FriendsArea = () => {
                                 justifyContent: "center",
                                 alignItems: "center"
                             }}>
-                                You seem a little lonely
+                                <span style={{
+                                    fontSize: "14px",
+                                    fontWeight: "bold",
+                                    fontFamily: "Inter",
+                                    color: "rgba(0, 0, 0, 0.5)"
+                                }}>You seem a little lonely!</span>
                             </Box>
                         </>
                 )}

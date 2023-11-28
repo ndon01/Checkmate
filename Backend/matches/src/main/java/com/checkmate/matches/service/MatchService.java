@@ -1,14 +1,20 @@
 package com.checkmate.matches.service;
 
 
+import com.checkmate.matches.config.RabbitMqConfig;
 import com.checkmate.matches.controller.MatchController;
 import com.checkmate.matches.model.entity.Match;
+import com.checkmate.matches.model.rabbitmq.MatchEventDTO;
+import com.checkmate.matches.model.rabbitmq.MatchEventType;
 import com.checkmate.matches.model.util.Game.Board;
 import com.checkmate.matches.model.util.Game.Move;
 import com.checkmate.matches.repository.MatchRepository;
 import com.checkmate.matches.*;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.checkmate.matches.*;
@@ -26,6 +32,13 @@ public class MatchService {
     @Autowired
     private MatchRepository matchRepository;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @PostConstruct
+    public void init() {
+        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+    }
 
     /***
      * Creates a match between two users and currently assumes the match type
@@ -52,24 +65,61 @@ public class MatchService {
         matchRepository.save(newMatch);
     }
 
-    public boolean resignRequest(long userId)
-    {
+    public Match pingMatch(long matchId, long userId) {
+        Optional<Match> optionalMatch = matchRepository.findById(matchId);
+        if (optionalMatch.isEmpty()) {
+            return null;
+        }
+
+        Match thisMatch = optionalMatch.get();
+
+        if (thisMatch.getWhiteUserId() == userId) {
+            thisMatch.setLastWhitePing(Instant.now().getEpochSecond());
+        } else if (thisMatch.getBlackUserId() == userId) {
+            thisMatch.setLastBlackPing(Instant.now().getEpochSecond());
+        } else {
+            return null;
+        }
+
+        // if both users have pinged and not started, start the match
+        if (thisMatch.getMatchStatus() == Match.MatchStatus.PENDING && thisMatch.getLastWhitePing() != null && thisMatch.getLastBlackPing() != null) {
+            thisMatch.setMatchStatus(Match.MatchStatus.PROGRESS);
+            thisMatch.setLastMoveTime(Instant.now().getEpochSecond());
+        }
+
+        if (thisMatch.getMatchStatus() == Match.MatchStatus.PROGRESS) {
+            long now = Instant.now().getEpochSecond();
+            long timeTaken = now - thisMatch.getLastMoveTime();
+            if (thisMatch.isWhiteTurn()) {
+                long newTime = thisMatch.getWhiteTimeLeft() - timeTaken;
+                thisMatch.setWhiteTimeLeft(newTime);
+            } else {
+                long newTime = thisMatch.getBlackTimeLeft() - timeTaken;
+                thisMatch.setWhiteTimeLeft(newTime);
+            }
+        }
+
+
+        return matchRepository.saveAndFlush(thisMatch);
+    }
+
+    public void finishMatch(long matchId) {
+        // post to rabbitmq
+    }
+
+    public boolean resignRequest(long userId) {
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
-        if(optionalMatch.isEmpty())
-        {
+        if (optionalMatch.isEmpty()) {
             return false;
         }
 
         Match thisMatch = optionalMatch.get();
         boolean isWhite;
         long otherUser;
-        if(thisMatch.getBlackUserId() == userId)
-        {
+        if (thisMatch.getBlackUserId() == userId) {
             isWhite = false;
             otherUser = thisMatch.getWhiteUserId();
-        }
-        else
-        {
+        } else {
             isWhite = true;
             otherUser = thisMatch.getBlackUserId();
         }
@@ -80,27 +130,22 @@ public class MatchService {
         return true;
     }
 
-    public boolean drawResponse(long userId, boolean response)
-    {
+    public boolean drawResponse(long userId, boolean response) {
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
-        if(optionalMatch.isEmpty())
-        {
+        if (optionalMatch.isEmpty()) {
             return false;
         }
 
         Match thisMatch = optionalMatch.get();
 
 
-        if(!thisMatch.isDrawRequested())
-        {
+        if (!thisMatch.isDrawRequested()) {
             return false;
         }
-        if(thisMatch.getDrawRequesterId() != userId)
-        {
+        if (thisMatch.getDrawRequesterId() != userId) {
             return false;
         }
-        if(!response)
-        {
+        if (!response) {
             thisMatch.setDrawRequested(false);
             thisMatch.setDrawRequesterId(null);
             matchRepository.saveAndFlush(thisMatch);
@@ -115,19 +160,16 @@ public class MatchService {
 
     }
 
-    public boolean drawRequest(long userId)
-    {
+    public boolean drawRequest(long userId) {
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
-        if(optionalMatch.isEmpty())
-        {
+        if (optionalMatch.isEmpty()) {
             return false;
         }
 
         Match myMatch = optionalMatch.get();
 
 
-        if(myMatch.isDrawRequested() && myMatch.getDrawRequesterId() != userId)
-        {
+        if (myMatch.isDrawRequested() && myMatch.getDrawRequesterId() != userId) {
 
             myMatch.setDraw(true);
             myMatch.setMatchStatus(Match.MatchStatus.FINISHED);
@@ -144,46 +186,36 @@ public class MatchService {
     }
 
 
-
-    public boolean makeMove(long userID, String move)
-    {
+    public boolean makeMove(long userID, String move) {
         Board myBoard = new Board();
 
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userID);
-        if(optionalMatch.isEmpty())
-        {
+        if (optionalMatch.isEmpty()) {
             return false;
         }
         Match thisMatch = optionalMatch.get();
         boolean isTurn = true;
 
-        if(thisMatch.isWhiteTurn() == true)
-        {
-            if(thisMatch.getWhiteUserId() == userID)
-            {
+        if (thisMatch.isWhiteTurn() == true) {
+            if (thisMatch.getWhiteUserId() == userID) {
                 isTurn = true;
             }
 
-        }
-        else
-        {
-            if(thisMatch.getBlackUserId() == userID)
-            {
+        } else {
+            if (thisMatch.getBlackUserId() == userID) {
                 isTurn = true;
             }
 
         }
 
-        if(!isTurn)
-        {
+        if (!isTurn) {
             return false;
         }
 
         myBoard.boardMaker(thisMatch.getCurrentBoard());
         Move myMove = new Move(move);
         boolean moveWorked = myBoard.move(myMove);
-        if(moveWorked == false)
-        {
+        if (moveWorked == false) {
             return false;
         }
 
@@ -192,13 +224,10 @@ public class MatchService {
         thisMatch.setMatchMoves(thisMatch.getMatchMoves() + move + ",");
         long now = Instant.now().getEpochSecond();
         long timeTaken = now - thisMatch.getLastMoveTime();
-        if(userID == thisMatch.getWhiteUserId())
-        {
+        if (userID == thisMatch.getWhiteUserId()) {
             long newTime = thisMatch.getWhiteTimeLeft() - timeTaken;
             thisMatch.setWhiteTimeLeft(newTime);
-        }
-        else
-        {
+        } else {
             long newTime = thisMatch.getBlackTimeLeft() - timeTaken;
             thisMatch.setWhiteTimeLeft(newTime);
         }

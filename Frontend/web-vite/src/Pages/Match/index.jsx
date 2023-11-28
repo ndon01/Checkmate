@@ -9,6 +9,7 @@ import axios from "axios";
 import { Chessboard } from "react-chessboard";
 
 import styles from './match.module.css';
+import {useUser} from "@/Contexts/UserContext.jsx";
 
 export const Match = () => {
 
@@ -17,58 +18,103 @@ export const Match = () => {
     const params = useParams();
     const { matchId} = params;
 
-    const [matchMetadata, setMatchMetadata] = React.useState({
-        id: "adfa",
-        whiteUserId: 1,
-        blackUserId: 2,
-        winnerUserId: null,
+    const {currentUser, checkContextValidity, setCurrentUser} = useUser();
 
-        wasDraw: false,
-        wasAbandoned: false,
-        wasForfeited: false,
+    if (currentUser === null) {
+        setCurrentUser(JSON.parse(localStorage.getItem("context")));
+    }
 
-        createdAt: null,
-        startedAt: null,
-        finishedAt: null,
-    })
+    const [matchData, setMatchData] = React.useState({
+        "matchId": 2,
+        "matchStatus": "PENDING",
+        "drawRequested": false,
+        "drawRequesterId": null,
+        "matchMoves": "",
+        "currentBoard": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+        "matchType": "BLITZ",
+        "whiteUserId": 2,
+        "blackUserId": 1,
+        "lastWhitePing": 1701163343,
+        "lastBlackPing": null,
+        "winnerUserId": null,
+        "lastMoveTime": null,
+        "whiteTimeLeft": 300,
+        "blackTimeLeft": 300,
+        "abandoned": false,
+        "forfeited": false,
+        "whiteTurn": true,
+        "draw": false,
+        "rated": true
+    });
 
-    const [matchState, setMatchState] = React.useState({
-        status: "notStarted", // notStarted, started, completed
-        boardState: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-        matchMoves: [],
-        currentMove: "w",
 
-        whiteSecondsLeft: 300,
-        blackSecondsLeft: 300,
-    })
+    function fetchMatchData() {
+        fetch(`http://localhost:8080/api/matches/pingMatch?matchId=${matchId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("access_token")
+            },
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(data => {
+                    setMatchData(data);
+                })
+            } else {
+                console.log(response)
+            }
+        }).catch(error => {
+            console.log(error)
+        })
+    }
 
+    useEffect(() => {
+        // fetch match data interval
+        const interval = setInterval(() => {
+            fetchMatchData();
+        }, 5000)
+
+        return () => clearInterval(interval);
+    }, [])
 
 
     const [chessBoardSize, setChessBoardSize] = React.useState(600);
 
-    useEffect(() => {
-        // Set up the interval only when the match starts
-        let timer;
-        if (matchState.status === 'started') {
-            timer = setInterval(() => {
-                setMatchState(prevState => {
-                    // Calculate new time based on whose turn it is
-                    const newTime = prevState.currentMove === 'w'
-                        ? prevState.whiteSecondsLeft - 1
-                        : prevState.blackSecondsLeft - 1;
+    // timer countdown
 
-                    return {
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            if (matchData.whiteTurn) {
+                if (matchData.whiteTimeLeft <= 0) {
+                    setMatchData(prevState => ({
                         ...prevState,
-                        whiteSecondsLeft: prevState.currentMove === 'w' ? newTime : prevState.whiteSecondsLeft,
-                        blackSecondsLeft: prevState.currentMove === 'b' ? newTime : prevState.blackSecondsLeft,
-                    };
-                });
-            }, 1000);
-        }
+                        winnerUserId: matchData.blackUserId,
+                        matchStatus: "FINISHED"
+                    }))
+                } else {
+                    setMatchData(prevState => ({
+                        ...prevState,
+                        whiteTimeLeft: prevState.whiteTimeLeft - 1
+                    }))
+                }
+            } else {
+                if (matchData.blackTimeLeft <= 0) {
+                    setMatchData(prevState => ({
+                        ...prevState,
+                        winnerUserId: matchData.whiteUserId,
+                        matchStatus: "FINISHED"
+                    }))
+                } else {
+                    setMatchData(prevState => ({
+                        ...prevState,
+                        blackTimeLeft: prevState.blackTimeLeft - 1
+                    }))
+                }
+            }
+        }, 1000)
 
-        // Clear the interval when component unmounts or when match status changes
-        return () => clearInterval(timer);
-    }, [matchState.status, matchState.currentMove]);
+        return () => clearInterval(interval);
+    }, [matchData])
 
     function secondsToMinutesSeconds(seconds) {
         const minutes = Math.floor(seconds / 60);
@@ -82,15 +128,23 @@ export const Match = () => {
     }
 
     function isDraggablePiece({piece}) {
-        console.log(piece)
-        return piece.startsWith("w");
+        let pieceColor = piece.startsWith("w") ? "white" : "black";
+
+        if (pieceColor === "white" && matchData.whiteUserId === currentUser.userId && matchData.whiteTurn) {
+            return true;
+        } else return pieceColor === "black" && matchData.blackUserId === currentUser.userId && !matchData.whiteTurn;
     }
+
+    console.log(matchData)
+    console.log(currentUser)
 
     return (
         <>
             <NavigationBar/>
 
             <MainArea>
+                {JSON.stringify(currentUser)}
+                {JSON.stringify(matchData)}
                 <div className={styles.pageContainer}>
                     <div className={styles.pageHeader}>
                         <span className={styles.pageTitle}>Nick vs Jack</span>
@@ -101,7 +155,7 @@ export const Match = () => {
                                 width: `${chessBoardSize}px`
                             }}>
                                 <div className={styles.playerUsernameContainer}>
-                                    <Circle/><span style={
+                                    {(matchData.whiteTurn && matchData.whiteUserId != currentUser.userId) ? <Circle/> : <CircleOutlined/>}<span style={
                                     {
                                         fontSize: '16px',
                                         fontFamily: 'Inter',
@@ -119,7 +173,7 @@ export const Match = () => {
                                             fontWeight: 'bold'
                                         }
                                     }>
-                                        {secondsToMinutesSeconds(matchState.blackSecondsLeft)}
+                                        {secondsToMinutesSeconds(matchData.blackUserId !== currentUser.userId ? matchData.blackTimeLeft : matchData.whiteTimeLeft)}
                                     </span>
                                 </div>
                             </div>
@@ -127,17 +181,18 @@ export const Match = () => {
                                 <Chessboard
 
                                     boardWidth={chessBoardSize}
-                                    boardOrientation={"white"}
+                                    boardOrientation={matchData.whiteUserId === currentUser.userId ? 'white' : 'black'}
                                     isDraggablePiece={isDraggablePiece}
                                     showBoardNotation={true}
-                                    position={matchState.boardState}
+                                    position={matchData.currentBoard}
+
                                 />
                             </div>
                             <div className={styles.playerContainer} style={{
                                 width: `${chessBoardSize}px`
                             }}>
                                 <div className={styles.playerUsernameContainer}>
-                                    <CircleOutlined/><span style={
+                                    {(matchData.whiteTurn && matchData.whiteUserId === currentUser.userId) ? <Circle/> : <CircleOutlined/>}<span style={
                                         {
                                             fontSize: '16px',
                                             fontFamily: 'Inter',
@@ -155,12 +210,14 @@ export const Match = () => {
                                             fontWeight: 'bold'
                                         }
                                     }>
-                                        {secondsToMinutesSeconds(matchState.whiteSecondsLeft)}
+                                        {secondsToMinutesSeconds(currentUser.userId === matchData.blackUserId ? matchData.blackTimeLeft : matchData.whiteTimeLeft)}
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    {JSON.stringify(matchData)}
                 </div>
             </MainArea>
 

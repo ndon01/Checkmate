@@ -12,6 +12,7 @@ import {
 import NavigationBar from "@/Components/NavigationBar/NavigationBar.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
 import useWebSocket from "react-use-websocket";
+import {useNavigate} from "react-router-dom";
 
 const token = localStorage.getItem("access_token")
 const WS_URL = `ws://localhost:8080/api/matchmaking/ws?token=${token}`
@@ -23,6 +24,7 @@ function Play() {
     const [confirmMatchDetails, setConfirmMatchDetails] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0); // New state for tracking elapsed time
 
+    const navigate = useNavigate();
 
     const startQueue = async () => {
         setSearchingForMatch(true);
@@ -70,23 +72,39 @@ function Play() {
                 console.log("Checking for match...");
 
                 try {
-                    const response = await fetch("http://localhost:8080/api/matchmaking/queue", {
+                    fetch("http://localhost:8080/api/matchmaking/queue", {
                         method: "GET",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + localStorage.getItem("access_token")
                         },
-                        body: JSON.stringify({
-                            token: localStorage.getItem("access_token")
-                        })
-                    });
+                    }).then((response) => {
+                        if (response.status === 200) {
+                            response.json().then(data => {
+                                if (data.matchFound) {
+                                    console.log("Match found!");
 
-                    const data = await response.json();
+                                    clearInterval(matchCheckInterval);
+                                    clearInterval(countdownInterval);
 
-                    if (Object.keys(data).length !== 0) {
-                        setConfirmMatchDetails(data);
-                        setSearchingForMatch(false);
-                        clearInterval(matchCheckInterval);
-                    }
+                                    fetch("http://localhost:8080/api/matches/getCurrentMatch", {
+                                        method: "GET",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "Authorization": "Bearer " + localStorage.getItem("access_token")
+                                        },
+                                    }).then((response) => {
+                                        if (response.status === 200) {
+                                            response.text().then(data => {
+                                                navigate("/match/" + data);
+                                            })
+                                        }
+                                    })
+
+                                }
+                            })
+                        }
+                    })
                 } catch (error) {
                     console.error("Error checking for match:", error);
                 }

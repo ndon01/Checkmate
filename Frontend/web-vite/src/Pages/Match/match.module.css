@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    width: 100vw;
+    min-width: max-content;
 }
 
 .pageHeader {
@@ -27,6 +27,8 @@
     justify-content: center;
     height: 90vh;
     width: 100vw;
+
+    padding-block: 25px;
 }
 
 .gameContainer {

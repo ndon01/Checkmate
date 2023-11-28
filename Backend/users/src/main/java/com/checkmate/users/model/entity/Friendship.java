@@ -28,11 +28,22 @@ public class Friendship {
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status = FriendshipStatus.PENDING;
 
+    @Column(name = "accepted_at", nullable = true)
+    private LocalDateTime acceptedAt;
+
+    @Column(name = "unfriended_at", nullable = true)
+    private LocalDateTime unfriendedAt;
+
+    @Column(name = "blocked_at", nullable = true)
+    private LocalDateTime blockedAt;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum FriendshipStatus {
         PENDING,
+        UNFRIENDED,
+        BLOCKED,
         FRIENDS
     }
 }

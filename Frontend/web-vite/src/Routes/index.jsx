@@ -17,7 +17,8 @@ import ForgotPassword from "@/Pages/Authentication/ForgotPassword";
 import {Settings} from "@/Pages/Authenticated/Settings/index.jsx";
 import ChangePassword from "@/Pages/Authentication/ChangePassword/index.jsx";
 import AboutPage from "@/Pages/Public/AboutPage/AboutPage.jsx";
-import {CompleteAccountSetup} from "@/Pages/Authenticated/CompleteAccountSetup/index.jsx";  // import the hook
+import {CompleteAccountSetup} from "@/Pages/Authenticated/CompleteAccountSetup/index.jsx";
+import {Relationships} from "@/Pages/Authenticated/Relationships/index.jsx";  // import the hook
 
 function RouteComponent() {
     const { isAuthenticated } = useUser(); // get the authentication status
@@ -39,6 +40,9 @@ function RouteComponent() {
                     <Route path='/forgot-password' element={<ForgotPassword />} />
 
                     <Route path='/settings' element={<Settings />} />
+
+                    <Route path='/relationships' element={<Relationships/>} />
+                    <Route path='/relationships/:relationshipPage' element={<Relationships/>} />
 
                     <Route path='/complete-account-setup' element={<CompleteAccountSetup/>} />
 

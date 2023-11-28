@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -39,9 +41,30 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing JWT token.");
         }
 
+        Optional<Match> match = matchRepository.findActiveMatchByUserId(decodedJWT.getClaim("userId").asLong());
 
-        System.out.println(decodedJWT.getClaim("userId").asLong());
-        return ResponseEntity.ok("Match details...");
+        if (match.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No active match found.");
+        }
+
+        return ResponseEntity.ok(match.get().getMatchId());
+    }
+
+    @PostMapping("/pingMatch")
+    @RequiresJWT
+    @Transactional
+    public ResponseEntity<?> pingMatch(@RequestParam("matchId") long matchId, HttpServletRequest request) {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        if (decodedJWT == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing JWT token.");
+        }
+
+        long userId = decodedJWT.getClaim("userId").asLong();
+
+        Match match = matchService.pingMatch(matchId, userId);
+
+        return ResponseEntity.ok(match);
     }
 
     @PostMapping("/makeMove")
@@ -84,10 +107,5 @@ public class MatchController {
         return ResponseEntity.ok("Draw request response received.");
 
     }
-
-
-
-
-
 
 }

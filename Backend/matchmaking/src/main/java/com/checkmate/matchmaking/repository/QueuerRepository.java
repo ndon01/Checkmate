@@ -14,6 +14,9 @@ public interface QueuerRepository extends JpaRepository<Queuer, Long> {
 
     Optional<Queuer> getQueuerByUserId(long userId);
 
+    long countByInQueueTrue();
+
+    long countByInQueueTrueAndEloBetween(int minElo, int maxElo);
 
     @Query(value = "SELECT * FROM queuers WHERE in_queue = true AND elo BETWEEN :minElo AND :maxElo and user_id != :currentUserId LIMIT 1",
             nativeQuery = true)
