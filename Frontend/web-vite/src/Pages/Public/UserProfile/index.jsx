@@ -3,16 +3,18 @@ import NavigationBar from "@/Components/NavigationBar/NavigationBar.jsx";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
 import {Skeleton, Box, Typography, Grid, Button} from "@mui/material";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 
 import styles from './UserProfile.module.css';
 
 const UserProfile = () => {
     const params = useParams();
+    const navigate = useNavigate();
     const {userId} = params;
 
     const [userData, setUserData] = React.useState({
+        userId: 1,
         username: 'nick',
         displayName: 'Nicholas Donahue',
         biography: '',
@@ -21,18 +23,183 @@ const UserProfile = () => {
         followingCount: 0,
         followerCount: 0,
 
-        isFriend: false,
-        isFriendPending: false,
-        isFriendRequested: false,
+        friends: false,
+        friendRequestSent: false,
+        requestingFriendship: false,
 
-        isFollowing: false, // user is following client
-        isFollower: false, // client is following user
+        following: false, // user is following client
+        follower: false, // client is following user
+
+        ownProfile: false,
 
     });
 
     useEffect(() => {
-        // fetch user data
+        fetch("http://localhost:8080/api/users/getUserProfile?userId=" + userId, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                navigate('/404');
+                throw new Error("Failed to fetch user profile");
+            }
+        }).then(data => {
+            setUserData(data);
+        }).catch(error => {
+            console.log(error);
+        })
     }, [])
+
+
+    function sendFriendRequest() {
+        fetch("http://localhost:8080/api/users/relationship/sendFriendRequest?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    friendRequestSent: true,
+                })
+            } else {
+                throw new Error("Failed to send friend request");
+            }
+        })
+    }
+
+    function cancelFriendRequest() {
+        fetch("http://localhost:8080/api/users/relationship/cancelFriendRequest?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    friendRequestSent: false,
+                })
+            } else {
+                throw new Error("Failed to cancel friend request");
+            }
+        })
+    }
+
+    function acceptFriendRequest() {
+        fetch("http://localhost:8080/api/users/relationship/acceptFriendRequest?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    friends: true,
+                    friendCount: userData.friendCount + 1,
+                    requestingFriendship: false,
+                })
+            } else {
+                throw new Error("Failed to accept friend request");
+            }
+        })
+    }
+
+    function denyFriendRequest() {
+        fetch("http://localhost:8080/api/users/relationship/denyFriendRequest?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    requestingFriendship: false,
+                })
+            } else {
+                throw new Error("Failed to deny friend request");
+            }
+        })
+    }
+
+    function removeFriend() {
+        fetch("http://localhost:8080/api/users/relationship/unfriendUser?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    requestingFriendship: false,
+                    friendCount: userData.friendCount - 1,
+                })
+            } else {
+                throw new Error("Failed to deny friend request");
+            }
+        })
+    }
+
+    function followUser() {
+        fetch("http://localhost:8080/api/users/relationship/followUser?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    following: true,
+                    followerCount: userData.followerCount + 1,
+                })
+            } else {
+                throw new Error("Failed to deny friend request");
+            }
+        })
+    }
+
+    function unfollowUser() {
+        fetch("http://localhost:8080/api/users/relationship/unfollowUser?userId=" + userData.userId, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                setUserData({
+                    ...userData,
+                    following: false,
+                    followerCount: userData.followerCount - 1,
+                })
+            } else {
+                throw new Error("Failed to deny friend request");
+            }
+        })
+    }
+
+    function numberToFormattedString(number) {
+        if (number >= 1000000) {
+            return (number / 1000000).toFixed(1) + "M";
+        } else if (number >= 1000) {
+            return (number / 1000).toFixed(1) + "K";
+        } else {
+            return number;
+        }
+    }
+
+    useEffect(() => {
+        console.log(userData)
+    }, [userData]);
+
 
     return (
         <>
@@ -43,6 +210,8 @@ const UserProfile = () => {
                     width: '100vw',
                     height: '100vh',
                 }}>
+
+                    {JSON.stringify(userData)}
 
                     <div style={{
                         display: 'flex',
@@ -70,6 +239,7 @@ const UserProfile = () => {
                             </Typography>
                         </div>
 
+
                         <div style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -88,7 +258,7 @@ const UserProfile = () => {
                             }}>
                                 <div>
                                     <Typography variant="h6">
-                                        {userData.friendCount}
+                                        {numberToFormattedString(userData.friendCount)}
                                     </Typography>
                                 </div>
                                 <div>
@@ -106,7 +276,7 @@ const UserProfile = () => {
                             }}>
                                 <div>
                                     <Typography variant="h6">
-                                        {userData.friendCount}
+                                        {numberToFormattedString(userData.followingCount)}
                                     </Typography>
                                 </div>
                                 <div>
@@ -125,7 +295,7 @@ const UserProfile = () => {
                             }}>
                                 <div>
                                     <Typography variant="h6">
-                                        {userData.friendCount}
+                                        {numberToFormattedString(userData.followerCount)}
                                     </Typography>
                                 </div>
                                 <div>
@@ -136,6 +306,7 @@ const UserProfile = () => {
                             </div>
                         </div>
 
+                        {!userData.ownProfile && (
                         <div style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -152,37 +323,37 @@ const UserProfile = () => {
                                 alignItems: 'center',
                                 marginRight: '25px'
                             }}>
-                                { userData.isFriendPending && (
+                                { userData.requestingFriendship && (
                                     <>
                                     <Button variant="contained" style={{
                                         backgroundColor: 'green',
-                                    }}>
+                                    }} onClick={acceptFriendRequest}>
                                         Accept Friend Request
                                     </Button>
 
                                     <Button variant="contained" style={{
                                         backgroundColor: 'red',
                                         marginTop: '10px'
-                                    }}>
+                                    }} onClick={denyFriendRequest}>
                                         Deny Friend Request
                                     </Button>
                                     </>
                                 )}
 
-                                {userData.isFriendRequested && (
-                                    <Button variant="contained" color="primary">
+                                {userData.friendRequestSent && (
+                                    <Button variant="contained" color="primary" onClick={cancelFriendRequest}>
                                         Cancel Request
                                     </Button>
                                 )}
 
-                                {userData.isFriend && (
-                                    <Button variant="contained" color="primary">
+                                {userData.friends && (
+                                    <Button variant="contained" color="primary" onClick={removeFriend}>
                                         Remove Friend
                                     </Button>
                                 )}
 
-                                {(!userData.isFriend && !userData.isFriendPending && !userData.isFriendRequested) && (
-                                    <Button variant="contained" color="primary">
+                                {(!userData.friends && !userData.friendRequestSent && !userData.requestingFriendship) && (
+                                    <Button variant="contained" color="primary" onClick={sendFriendRequest}>
                                         Add Friend
                                     </Button>
                                 )}
@@ -195,18 +366,17 @@ const UserProfile = () => {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                             }}>
-                                {userData.isFollower ? (
-                                    <Button variant="contained" color="primary">
+                                {userData.following ? (
+                                    <Button variant="contained" color="primary" onClick={unfollowUser}>
                                         Unfollow
                                     </Button>
                                 ) : (
-                                    <Button variant="contained" color="primary">
+                                    <Button variant="contained" color="primary" onClick={followUser}>
                                         Follow
                                     </Button>
                                 )}
                             </div>
-
-                        </div>
+                        </div>)}
                     </div>
 
                 </Box>

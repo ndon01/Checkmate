@@ -68,11 +68,11 @@ export const UserProvider = ({children}) => {
 
 
         if (hasRefreshToken && hasAccessToken) {
+            console.log("has refresh token and access token");
             const storedUserContext = localStorage.getItem('context');
             const lastContextTime = localStorage.getItem("lastContext");
-            let hasUserContext = storedUserContext != null;
+            let hasUserContext = storedUserContext !== null && storedUserContext !== "null";
             let getUserContext = false;
-
             if (hasUserContext) {
                 if (lastContextTime == null) {
                     getUserContext = true;

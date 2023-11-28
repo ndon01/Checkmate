@@ -43,6 +43,10 @@ public class RelationshipController {
             return ResponseEntity.status(401).build();
         }
 
+        if (userId == requesterId) {
+            return ResponseEntity.status(400).body("You cannot send a friend request to yourself");
+        }
+
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
 
         if (optionalUser.isEmpty()) {
@@ -52,8 +56,8 @@ public class RelationshipController {
         User userToRequest = optionalUser.get();
 
         // Check if user is already friends with the user
-        Friendship requesterToRequested = friendshipRepository.findByUserId1AndUserId2(requesterId, userId);
-        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requesterId);
+        Friendship requesterToRequested = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, userId);
+        Friendship requestedToRequester = friendshipRepository.findByRequesterIdAndReceiverId(userId, requesterId);
 
         // Friendship request exists from requested to requester, check if it's pending
         if (requestedToRequester != null) {
@@ -101,6 +105,10 @@ public class RelationshipController {
             return ResponseEntity.status(401).build();
         }
 
+        if (userId == requesterId) {
+            return ResponseEntity.status(400).body("You cannot cancel a friend request to yourself");
+        }
+
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
 
         if (optionalUser.isEmpty()) {
@@ -110,8 +118,8 @@ public class RelationshipController {
         User user = optionalUser.get();
 
         // Check if user is already friends with the user
-        Friendship requesterToRequested = friendshipRepository.findByUserId1AndUserId2(requesterId, userId);
-        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requesterId);
+        Friendship requesterToRequested = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, userId);
+        Friendship requestedToRequester = friendshipRepository.findByRequesterIdAndReceiverId(userId, requesterId);
 
         // Friendship request exists from requested to requester
         if (requestedToRequester != null) {
@@ -148,16 +156,25 @@ public class RelationshipController {
             return ResponseEntity.status(401).build();
         }
 
+        if (userId == requestedId) {
+            return ResponseEntity.status(400).body("You cannot accept a friend request from yourself");
+        }
+
+
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
 
         if (optionalUser.isEmpty()) {
             return  ResponseEntity.status(401).build();
         }
 
+        if (userId == requestedId) {
+            return ResponseEntity.status(400).body("You cannot accept a friend request from yourself");
+        }
+
         User user = optionalUser.get();
 
         // Check if user is already friends with the user
-        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requestedId);
+        Friendship requestedToRequester = friendshipRepository.findByRequesterIdAndReceiverId(userId, requestedId);
 
         if (requestedToRequester == null) {
             return ResponseEntity.status(400).body("You did not receive a friend request from this user");
@@ -187,6 +204,10 @@ public class RelationshipController {
             return ResponseEntity.status(401).build();
         }
 
+        if (userId == requestedId) {
+            return ResponseEntity.status(400).body("You cannot deny a friend request from yourself");
+        }
+
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
 
         if (optionalUser.isEmpty()) {
@@ -196,7 +217,7 @@ public class RelationshipController {
         User user = optionalUser.get();
 
         // Check if user is already friends with the user
-        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, requestedId);
+        Friendship requestedToRequester = friendshipRepository.findByRequesterIdAndReceiverId(userId, requestedId);
 
         if (requestedToRequester == null) {
             return ResponseEntity.status(400).body("You did not receive a friend request from this user");
@@ -222,6 +243,11 @@ public class RelationshipController {
             return ResponseEntity.status(401).build();
         }
 
+        if (userId == decodedJWT.getClaim("userId").asLong()) {
+            return ResponseEntity.status(400).body("You cannot unfriend yourself");
+        }
+
+
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
 
         if (optionalUser.isEmpty()) {
@@ -231,8 +257,8 @@ public class RelationshipController {
         User user = optionalUser.get();
 
         // Check if user is already friends with the user
-        Friendship requesterToRequested = friendshipRepository.findByUserId1AndUserId2(user.getUserId(), userId);
-        Friendship requestedToRequester = friendshipRepository.findByUserId1AndUserId2(userId, user.getUserId());
+        Friendship requesterToRequested = friendshipRepository.findByRequesterIdAndReceiverId(user.getUserId(), userId);
+        Friendship requestedToRequester = friendshipRepository.findByRequesterIdAndReceiverId(userId, user.getUserId());
 
         // Friendship request exists from requested to requester
         if (requestedToRequester != null) {
@@ -271,6 +297,10 @@ public class RelationshipController {
             return ResponseEntity.status(401).build();
         }
 
+        if (userId == followerId) {
+            return ResponseEntity.status(400).body("You cannot follow yourself");
+        }
+
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
 
         if (optionalUser.isEmpty()) {
@@ -304,6 +334,10 @@ public class RelationshipController {
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).build();
+        }
+
+        if (userId == followerId) {
+            return ResponseEntity.status(400).body("You cannot unfollow yourself");
         }
 
         Optional<User> optionalUser = userRepository.findByCredentialId(decodedJWT.getClaim("userId").asLong());
