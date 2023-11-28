@@ -23,7 +23,7 @@ export const Dashboard = () => {
             }}>
                 <WelcomeArea/>
                 <FriendsArea/>
-                <MatchHistoryArea/>
+                {/*<MatchHistoryArea/>*/}
             </Container>
 
             </MainArea>

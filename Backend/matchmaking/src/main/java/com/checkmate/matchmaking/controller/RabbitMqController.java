@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Controller
@@ -25,7 +26,7 @@ public class RabbitMqController {
 
     private static final Logger logger = LoggerFactory.getLogger(RabbitMqController.class);
 
-    @RabbitListener(queues = RabbitMqConfig.MATCHMAKING_USER_EVENTS_QUEUE)
+    @RabbitListener(queues = RabbitMqConfig.USER_EVENTS_QUEUE)
     public void handleRegistrationEvent(UserEventDTO event) {
         if (event.getEventType() == UserEventType.USER_REGISTRATION) {
             System.out.println("Received registration event for user: " + event.getAdditionalDetails().get("username"));
@@ -33,10 +34,14 @@ public class RabbitMqController {
         }
     }
 
-    @RabbitListener(queues = RabbitMqConfig.MATCHMAKING_MATCH_EVENT_QUEUE)
+    @RabbitListener(queues = RabbitMqConfig.MATCHMAKING_MICROSERVICE_DIRECT_QUEUE)
+    @Transactional
     public void handleMatchEvent(MatchEventDTO event) {
 
+        System.out.println("recieved event");
+
         if (event.getEventType() == MatchEventType.MATCH_FINISHED) {
+            System.out.println("finished");
             long matchId = Long.valueOf(event.getAdditionalDetails().get("matchId"));
             long whiteUserId = Long.valueOf(event.getAdditionalDetails().get("whiteUserId"));
             long blackUserId = Long.valueOf(event.getAdditionalDetails().get("blackUserId"));
@@ -56,6 +61,14 @@ public class RabbitMqController {
                 queuer.setInQueue(false);
                 queuer.setInMatch(false);
                 queuerRepository.save(queuer);
+            });
+
+        } else if (event.getEventType() == MatchEventType.DEBUG_USER_MATCHES) {
+            String userId = event.getAdditionalDetails().get("userId");
+            queuerRepository.getQueuerByUserId(Long.parseLong(userId)).ifPresent(queuer -> {
+                queuer.setInMatch(false);
+                queuer.setInQueue(false);
+                queuerRepository.saveAndFlush(queuer);
             });
 
         }

@@ -11,6 +11,8 @@ import {blue} from "@mui/material/colors";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
 import {Title} from "@mui/icons-material";
+import TwinklingStars from "@/Components/TwinklingStars.jsx";
+import imgUrl from "@/Assets/CheckmateLogoInverted.png";
 
 function LandingPage() {
     return (
@@ -20,7 +22,9 @@ function LandingPage() {
                 <Container
                     maxWidth="100%"
                     style={{
-                        height: "400px",
+                        height: "100vh",
+                        width: "100vw",
+                        zIndex: 10,
                     }}
                 >
                     <Box
@@ -30,27 +34,30 @@ function LandingPage() {
                         justifyContent="center"
                         height="100%"
                     >
-                        <Typography variant="h2" gutterBottom>
-                            Checkmate
-                        </Typography>
+                        <img
+                            src={imgUrl}
+                            style={{ width: "200px", height: "200px", padding: '50px'}}
+                            alt="logo"
+                        />
                         <Box>
                             <Button
                                 to="/login"
                                 variant="contained"
                                 fullWidth
                                 component={Link}
-                                style={{marginBottom: "15px"}}
+                                style={{marginBottom: "15px", zIndex: 10}}
                             >
                                 Sign in to an Existing Account
                             </Button>
-                            <Button to="/register" variant="outlined" fullWidth component={Link}>
+                            <Button to="/register" variant="contained" fullWidth component={Link} style={{backgroundColor: 'white', color: "#1976d2", zIndex: 10}}>
                                 Create an Account
                             </Button>
                         </Box>
                     </Box>
                 </Container>
-                <div style={{width: "100vw", height: "100vh"}}  >
+                <div style={{width: "100vw", height: "100vh", position: 'absolute', top: '0px', zIndex: 0}}  >
 
+                    <TwinklingStars width={'100px'} height={'100px'}/>
 
                 </div>
             </MainArea>

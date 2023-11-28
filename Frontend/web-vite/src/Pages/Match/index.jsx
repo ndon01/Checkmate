@@ -6,7 +6,7 @@ import {MainArea} from "@/Components/General/MainArea.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect} from "react";
 import axios from "axios";
-import { Chessboard } from "react-chessboard";
+import {Chessboard} from "react-chessboard";
 
 import styles from './match.module.css';
 import {useUser} from "@/Contexts/UserContext.jsx";
@@ -16,7 +16,7 @@ export const Match = () => {
     const navigate = useNavigate();
 
     const params = useParams();
-    const { matchId} = params;
+    const {matchId} = params;
 
     const {currentUser, checkContextValidity, setCurrentUser} = useUser();
 
@@ -24,29 +24,17 @@ export const Match = () => {
         setCurrentUser(JSON.parse(localStorage.getItem("context")));
     }
 
-    const [matchData, setMatchData] = React.useState({
-        "matchId": 2,
-        "matchStatus": "PENDING",
-        "drawRequested": false,
-        "drawRequesterId": null,
-        "matchMoves": "",
-        "currentBoard": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-        "matchType": "BLITZ",
-        "whiteUserId": 2,
-        "blackUserId": 1,
-        "lastWhitePing": 1701163343,
-        "lastBlackPing": null,
-        "winnerUserId": null,
-        "lastMoveTime": null,
-        "whiteTimeLeft": 300,
-        "blackTimeLeft": 300,
-        "abandoned": false,
-        "forfeited": false,
-        "whiteTurn": true,
-        "draw": false,
-        "rated": true
-    });
+    const [matchData, setMatchData] = React.useState({});
 
+
+    useEffect(() => {
+        // Fetch match data interval
+        const interval = setInterval(() => {
+            fetchMatchData();
+        }, 1000); // Polling every 1 seconds
+
+        return () => clearInterval(interval);
+    }, []); // Empty dependency array to run only on mount and unmount
 
     function fetchMatchData() {
         fetch(`http://localhost:8080/api/matches/pingMatch?matchId=${matchId}`, {
@@ -58,7 +46,10 @@ export const Match = () => {
         }).then(response => {
             if (response.ok) {
                 response.json().then(data => {
-                    setMatchData(data);
+                    // Update state only if the turn or match status has changed
+                    if (data.whiteTurn !== matchData.whiteTurn || data.matchStatus !== matchData.matchStatus) {
+                        setMatchData(data);
+                    }
                 })
             } else {
                 console.log(response)
@@ -68,53 +59,42 @@ export const Match = () => {
         })
     }
 
-    useEffect(() => {
-        // fetch match data interval
-        const interval = setInterval(() => {
-            fetchMatchData();
-        }, 5000)
-
-        return () => clearInterval(interval);
-    }, [])
-
-
     const [chessBoardSize, setChessBoardSize] = React.useState(600);
 
     // timer countdown
-
     React.useEffect(() => {
         const interval = setInterval(() => {
+            if (matchData.whiteTimeLeft <= 0 || matchData.blackTimeLeft <= 0) {
+                clearInterval(interval);
+            }
+
+            if (matchData.matchStatus === "FINISHED") {
+                clearInterval(interval);
+            }
+
+            if (matchData.matchStatus === "PENDING") {
+                return;
+            }
+
+            console.log("in progress")
             if (matchData.whiteTurn) {
-                if (matchData.whiteTimeLeft <= 0) {
-                    setMatchData(prevState => ({
-                        ...prevState,
-                        winnerUserId: matchData.blackUserId,
-                        matchStatus: "FINISHED"
-                    }))
-                } else {
-                    setMatchData(prevState => ({
-                        ...prevState,
-                        whiteTimeLeft: prevState.whiteTimeLeft - 1
-                    }))
-                }
+                setMatchData(prevState => ({
+                    ...prevState,
+                    whiteTimeLeft: prevState.whiteTimeLeft - 1
+                }))
             } else {
-                if (matchData.blackTimeLeft <= 0) {
-                    setMatchData(prevState => ({
-                        ...prevState,
-                        winnerUserId: matchData.whiteUserId,
-                        matchStatus: "FINISHED"
-                    }))
-                } else {
-                    setMatchData(prevState => ({
-                        ...prevState,
-                        blackTimeLeft: prevState.blackTimeLeft - 1
-                    }))
-                }
+
+                setMatchData(prevState => ({
+                    ...prevState,
+                    blackTimeLeft: prevState.blackTimeLeft - 1
+                }))
             }
         }, 1000)
 
+        console.log(matchData.whiteTurn, matchData.whiteTimeLeft, matchData.blackTimeLeft)
+
         return () => clearInterval(interval);
-    }, [matchData])
+    }, [[matchData.whiteTurn, matchData.whiteTimeLeft, matchData.blackTimeLeft]])
 
     function secondsToMinutesSeconds(seconds) {
         const minutes = Math.floor(seconds / 60);
@@ -155,7 +135,8 @@ export const Match = () => {
                                 width: `${chessBoardSize}px`
                             }}>
                                 <div className={styles.playerUsernameContainer}>
-                                    {(matchData.whiteTurn && matchData.whiteUserId != currentUser.userId) ? <Circle/> : <CircleOutlined/>}<span style={
+                                    {(matchData.whiteTurn && matchData.whiteUserId != currentUser.userId) ? <Circle/> :
+                                        <CircleOutlined/>}<span style={
                                     {
                                         fontSize: '16px',
                                         fontFamily: 'Inter',
@@ -192,14 +173,15 @@ export const Match = () => {
                                 width: `${chessBoardSize}px`
                             }}>
                                 <div className={styles.playerUsernameContainer}>
-                                    {(matchData.whiteTurn && matchData.whiteUserId === currentUser.userId) ? <Circle/> : <CircleOutlined/>}<span style={
-                                        {
-                                            fontSize: '16px',
-                                            fontFamily: 'Inter',
-                                            fontWeight: 'bold',
-                                            marginLeft: '10px'
-                                        }
-                                    }>You <span style={{fontWeight: 'normal'}}>(1200)</span>
+                                    {(matchData.whiteTurn && matchData.whiteUserId === currentUser.userId) ? <Circle/> :
+                                        <CircleOutlined/>}<span style={
+                                    {
+                                        fontSize: '16px',
+                                        fontFamily: 'Inter',
+                                        fontWeight: 'bold',
+                                        marginLeft: '10px'
+                                    }
+                                }>You <span style={{fontWeight: 'normal'}}>(1200)</span>
                                     </span>
                                 </div>
                                 <div className={styles.timerContainer}>

@@ -29,7 +29,7 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(matchesMatchEventQueue).to(matchEventExchange);
     }
 
-    public static final String MATCH_MICROSERVICE_QUEUE = UUID.randomUUID().toString();
+    public static final String MATCH_MICROSERVICE_QUEUE = "match_microservice_queue";
     public static final String MATCH_MICROSERVICE_EXCHANGE = "match_microservice_exchange";
 
     @Bean
@@ -37,14 +37,36 @@ public class RabbitMqConfig {
         return new Queue(MATCH_MICROSERVICE_QUEUE, false, false, true);
     }
     @Bean
-    DirectExchange matchMicroserviceExchange() {
-        return new DirectExchange(MATCH_MICROSERVICE_EXCHANGE);
+    FanoutExchange matchMicroserviceExchange() {
+        return new FanoutExchange(MATCH_MICROSERVICE_EXCHANGE);
     }
     @Bean
-    Binding bindingMatchMicroservice(Queue matchMicroserviceQueue, DirectExchange matchMicroserviceExchange) {
-        return BindingBuilder.bind(matchMicroserviceQueue).to(matchMicroserviceExchange).withQueueName();
+    Binding bindingMatchMicroserviceExchangeQueue(Queue matchMicroserviceQueue, FanoutExchange matchMicroserviceExchange) {
+        return BindingBuilder.bind(matchMicroserviceQueue).to(matchMicroserviceExchange);
     }
 
+    public static final String MATCH_MICROSERVICE_DIRECT_QUEUE = "match_microservice_direct_queue";
+    public static final String MATCH_MICROSERVICE_DIRECT_EXCHANGE = "match_microservice_direct_exchange";
+
+    @Bean
+    Queue matchMicroserviceDirectQueue() {
+        return new Queue(MATCH_MICROSERVICE_DIRECT_QUEUE, false, false, true);
+    }
+    @Bean
+    DirectExchange matchMicroserviceDirectExchange() {
+        return new DirectExchange(MATCH_MICROSERVICE_DIRECT_EXCHANGE);
+    }
+    @Bean
+    Binding bindingMatchMicroservice(Queue matchMicroserviceDirectQueue, DirectExchange matchMicroserviceDirectExchange) {
+        return BindingBuilder.bind(matchMicroserviceDirectQueue).to(matchMicroserviceDirectExchange).withQueueName();
+    }
+
+    public static final String MATCHMAKING_MICROSERVICE_DIRECT_EXCHANGE = "matchmaking_microservice_direct_exchange";
+
+    @Bean
+    DirectExchange matchmakingMicroserviceDirectExchange() {
+        return new DirectExchange(MATCHMAKING_MICROSERVICE_DIRECT_EXCHANGE);
+    }
 
     // JSON Message Converter
     @Bean

@@ -33,7 +33,8 @@ function Play() {
         const response = await fetch("http://localhost:8080/api/matchmaking/enter", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("access_token")
             },
             body: JSON.stringify({
                 token: localStorage.getItem("access_token")
@@ -48,7 +49,8 @@ function Play() {
         const response = await fetch("http://localhost:8080/api/matchmaking/leave", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("access_token")
             },
             body: JSON.stringify({
                 token: localStorage.getItem("access_token")
@@ -56,11 +58,43 @@ function Play() {
         });
     };
 
+    useEffect(() => {
+        fetch("http://localhost:8080/api/matchmaking/queue", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("access_token")
+            },
+        }).then((response) => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.matchFound) {
+                        console.log("Match found!");
+
+                        fetch("http://localhost:8080/api/matches/getCurrentMatch", {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + localStorage.getItem("access_token")
+                            },
+                        }).then((response) => {
+                            if (response.status === 200) {
+                                response.text().then(data => {
+                                    navigate("/match/" + data);
+                                })
+                            }
+                        })
+
+                    }
+                })
+            }
+        })
+    }, [])
+
     // queue ping
     useEffect(() => {
         let matchCheckInterval;
         let countdownInterval;
-
 
         if (searchingForMatch) {
 

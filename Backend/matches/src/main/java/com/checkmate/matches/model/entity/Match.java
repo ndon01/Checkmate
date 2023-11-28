@@ -3,6 +3,8 @@ package com.checkmate.matches.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
+
 @Entity
 @Data
 @Table(name = "matches")
@@ -36,6 +38,8 @@ public class Match {
     @Column(name = "is_forfeited")
     private boolean isForfeited = false;
 
+    @Column(name = "is_finished", nullable = true)
+    private boolean isFinished = false;
 
     @Column(name ="match_moves")
     private String matchMoves = "";
@@ -44,7 +48,7 @@ public class Match {
     private String currentBoard = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     @Column(name = "isWhiteTurn")
-    private boolean isWhiteTurn = true;
+    private Boolean isWhiteTurn = true;
 
     // Other variables
     @Column(name = "match_type")
@@ -68,7 +72,7 @@ public class Match {
 
     @Column(name = "last_move_time")
 
-    private Long lastMoveTime;
+    private Long lastMoveTime = Instant.now().getEpochSecond();
 
     @Column(name = "white_time_left_seconds")
     private Long whiteTimeLeft;

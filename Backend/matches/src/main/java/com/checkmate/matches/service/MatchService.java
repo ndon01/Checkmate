@@ -73,12 +73,50 @@ public class MatchService {
 
         Match thisMatch = optionalMatch.get();
 
+        if (thisMatch.isFinished()) {
+            return null;
+        }
+
         if (thisMatch.getWhiteUserId() == userId) {
             thisMatch.setLastWhitePing(Instant.now().getEpochSecond());
+            thisMatch = matchRepository.saveAndFlush(thisMatch);
         } else if (thisMatch.getBlackUserId() == userId) {
             thisMatch.setLastBlackPing(Instant.now().getEpochSecond());
-        } else {
-            return null;
+            thisMatch = matchRepository.saveAndFlush(thisMatch);
+        }
+
+        if ((Instant.now().getEpochSecond() - thisMatch.getLastMoveTime()) > 30000 && (thisMatch.getMatchStatus() != Match.MatchStatus.PENDING || thisMatch.getMatchMoves().isEmpty()) || thisMatch.getMatchMoves().length() == 5) {
+            thisMatch.setAbandoned(true);
+            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+            finishMatch(thisMatch);
+            return matchRepository.saveAndFlush(thisMatch);
+        }
+
+        if (thisMatch.getBlackTimeLeft() <= 0 || thisMatch.getWhiteTimeLeft() <= 0) {
+            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+            finishMatch(thisMatch);
+            return matchRepository.saveAndFlush(thisMatch);
+        }
+
+        if (thisMatch.getMatchStatus() == Match.MatchStatus.FINISHED) {
+            thisMatch.setFinished(true);
+            finishMatch(thisMatch);
+            return matchRepository.saveAndFlush(thisMatch);
+        }
+
+        // if length is zero and match is progress and it has been 30 seconds, abandon the match
+        if (thisMatch.getMatchStatus() != Match.MatchStatus.PENDING && thisMatch.getMatchMoves().isEmpty() && (Instant.now().getEpochSecond() - thisMatch.getLastMoveTime()) > 30000) {
+            thisMatch.setAbandoned(true);
+            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+            finishMatch(thisMatch);
+            return matchRepository.saveAndFlush(thisMatch);
+        }
+
+        if (thisMatch.getMatchStatus() != Match.MatchStatus.PENDING && thisMatch.getMatchMoves().length() == 5 && (Instant.now().getEpochSecond() - thisMatch.getLastMoveTime()) > 30000) {
+            thisMatch.setAbandoned(true);
+            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+            finishMatch(thisMatch);
+            return matchRepository.saveAndFlush(thisMatch);
         }
 
         // if both users have pinged and not started, start the match
@@ -87,25 +125,44 @@ public class MatchService {
             thisMatch.setLastMoveTime(Instant.now().getEpochSecond());
         }
 
-        if (thisMatch.getMatchStatus() == Match.MatchStatus.PROGRESS) {
-            long now = Instant.now().getEpochSecond();
-            long timeTaken = now - thisMatch.getLastMoveTime();
-            if (thisMatch.isWhiteTurn()) {
-                long newTime = thisMatch.getWhiteTimeLeft() - timeTaken;
-                thisMatch.setWhiteTimeLeft(newTime);
-            } else {
-                long newTime = thisMatch.getBlackTimeLeft() - timeTaken;
-                thisMatch.setWhiteTimeLeft(newTime);
-            }
+        if (!thisMatch.getCurrentBoard().contains("k")) {
+            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+            thisMatch.setWinnerUserId(thisMatch.getBlackUserId());
+            return matchRepository.saveAndFlush(thisMatch);
+        }
+
+        if (!thisMatch.getCurrentBoard().contains("K")) {
+            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+            thisMatch.setWinnerUserId(thisMatch.getBlackUserId());
+            return matchRepository.saveAndFlush(thisMatch);
         }
 
 
         return matchRepository.saveAndFlush(thisMatch);
     }
 
-    public void finishMatch(long matchId) {
+    public void finishMatch(Match match) {
         // post to rabbitmq
+
+        MatchEventDTO matchEventDTO = new MatchEventDTO();
+        matchEventDTO.setEventType(MatchEventType.MATCH_FINISHED);
+        matchEventDTO.addAdditionalDetails("matchId", Long.toString(match.getMatchId()));
+        matchEventDTO.addAdditionalDetails("whiteUserId", String.valueOf(match.getWhiteUserId()));
+        matchEventDTO.addAdditionalDetails("blackUserId", String.valueOf(match.getBlackUserId()));
+
+        rabbitTemplate.convertAndSend(RabbitMqConfig.MATCHMAKING_MICROSERVICE_DIRECT_EXCHANGE, "matchmaking_microservice_direct_queue", matchEventDTO);
     }
+
+    public void debugUserMatches(long userId) {
+        // post to rabbitmq
+
+        MatchEventDTO matchEventDTO = new MatchEventDTO();
+        matchEventDTO.setEventType(MatchEventType.DEBUG_USER_MATCHES);
+        matchEventDTO.addAdditionalDetails("userId", String.valueOf(userId));
+        rabbitTemplate.convertAndSend(RabbitMqConfig.MATCHMAKING_MICROSERVICE_DIRECT_EXCHANGE, "matchmaking_microservice_direct_queue", matchEventDTO);
+
+    }
+
 
     public boolean resignRequest(long userId) {
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
@@ -196,7 +253,7 @@ public class MatchService {
         Match thisMatch = optionalMatch.get();
         boolean isTurn = true;
 
-        if (thisMatch.isWhiteTurn() == true) {
+        if (thisMatch.getIsWhiteTurn() == true) {
             if (thisMatch.getWhiteUserId() == userID) {
                 isTurn = true;
             }
@@ -232,7 +289,7 @@ public class MatchService {
             thisMatch.setWhiteTimeLeft(newTime);
         }
 
-        thisMatch.setWhiteTurn(!thisMatch.isWhiteTurn());
+        thisMatch.setIsWhiteTurn(!thisMatch.getIsWhiteTurn());
         thisMatch.setLastMoveTime(now);
 
         matchRepository.saveAndFlush(thisMatch);

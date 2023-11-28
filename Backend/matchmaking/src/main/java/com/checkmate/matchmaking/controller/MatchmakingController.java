@@ -30,18 +30,27 @@ public class MatchmakingController {
     }
 
     @PostMapping("/enter")
-    public ResponseEntity<?> enterQueue(@RequestBody EnterQueueRequest enterQueueRequest) {
-        DecodedJWT decodedJWT = TokenUtil.validateToken(enterQueueRequest.getToken());
-
-        System.out.println(enterQueueRequest.getToken());
-
-        System.out.println(decodedJWT);
+    @RequiresJWT
+    public ResponseEntity<?> enterQueue(HttpServletRequest request) {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).body("fail");
         }
 
-        System.out.println(decodedJWT.getClaim("userId"));
+        Queuer queuer = queueService.getQueuerByUserId(decodedJWT.getClaim("userId").asLong());
+
+        if (queuer == null) {
+            queuer = queueService.createQueuer(decodedJWT.getClaim("userId").asLong());
+        }
+
+        if (queuer.isInMatch()) {
+            return ResponseEntity.status(200).body("already in match");
+        }
+
+        if (queuer.isInQueue()) {
+            return ResponseEntity.status(400).body("already in queue");
+        }
 
         queueService.queueUserId(decodedJWT.getClaim("userId").asLong());
 
@@ -49,11 +58,26 @@ public class MatchmakingController {
     }
 
     @PostMapping("/leave")
-    public ResponseEntity<?> leaveQueue(@RequestBody LeaveQueueRequest leaveQueueRequest) {
-        DecodedJWT decodedJWT = TokenUtil.validateToken(leaveQueueRequest.getToken());
+    @RequiresJWT
+    public ResponseEntity<?> leaveQueue(HttpServletRequest request) {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
 
         if (decodedJWT == null) {
             return ResponseEntity.status(401).body("fail");
+        }
+
+        Queuer queuer = queueService.getQueuerByUserId(decodedJWT.getClaim("userId").asLong());
+
+        if (queuer == null) {
+            queuer = queueService.createQueuer(decodedJWT.getClaim("userId").asLong());
+        }
+
+        if (queuer.isInMatch()) {
+            return ResponseEntity.status(200).body("already in match");
+        }
+
+        if (!queuer.isInQueue()) {
+            return ResponseEntity.status(400).body("not in queue");
         }
 
         queueService.dequeueUserId(decodedJWT.getClaim("userId").asLong());

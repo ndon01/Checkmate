@@ -16,8 +16,9 @@ public class RabbitMqController {
     @Autowired
     private MatchService matchService;
 
-    @RabbitListener(queues = RabbitMqConfig.MATCHES_MATCH_EVENT_QUEUE)
+    @RabbitListener(queues = RabbitMqConfig.MATCH_MICROSERVICE_DIRECT_QUEUE)
     public void handleMatchEvent(MatchEventDTO event) {
+
 
         if (event.getEventType() == MatchEventType.MATCH_CREATED) {
             System.out.println("Received match created event for match: ");

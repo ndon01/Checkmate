@@ -151,6 +151,13 @@ const IdentifierForm = ({identifier = '', nextPage = null}) => {
                         <Button variant="contained" color="primary" onClick={handleSubmit} style={{marginTop: '20px'}}>
                             Request Verification
                         </Button>
+
+
+                        <Button variant="contained" onClick={() => {
+                            navigate('/login');
+                        }} style={{marginTop: '20px', backgroundColor: 'grey', color: 'white'}}>
+                            Go Back
+                        </Button>
                     </Box>
                 </>)}
 

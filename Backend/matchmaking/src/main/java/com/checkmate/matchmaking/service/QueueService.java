@@ -56,7 +56,7 @@ public class QueueService {
         Queuer q = new Queuer();
         q.setUserId(userId);
         q.setInQueue(false);
-        return queuerRepository.save(q);
+        return queuerRepository.saveAndFlush(q);
 
     }
 
@@ -70,12 +70,15 @@ public class QueueService {
 
         // opponent was inactive, find another
         if ((Long.parseLong(opponent.getLastPing()) - System.currentTimeMillis()) > 30000) {
-            opponent.setInQueue(false);
             return findOpponent(searchingFor, minElo, maxElo);
         }
 
-        opponent.setInQueue(false);
+        if (!opponent.isInQueue()) {
+            return null;
+        }
 
+        opponent.setInQueue(false);
+        searchingFor.setInQueue(false);
         searchingFor.setInMatch(true);
         opponent.setInMatch(true);
 
@@ -90,7 +93,9 @@ public class QueueService {
         matchmakingEventDTO.addAdditionalDetails("user1", String.valueOf(searchingFor.getUserId()));
         matchmakingEventDTO.addAdditionalDetails("user2", String.valueOf(opponent.getUserId()));
 
-        rabbitTemplate.convertAndSend(RabbitMqConfig.MATCH_EVENT_EXCHANGE, "", matchmakingEventDTO);
+        logger.info("Creating match with" + searchingFor.getUserId() + ", " + opponent.getUserId());
+
+        rabbitTemplate.convertAndSend(RabbitMqConfig.MATCH_MICROSERVICE_DIRECT_EXCHANGE, "match_microservice_direct_queue", matchmakingEventDTO);
 
         return opponent;
     }
@@ -112,7 +117,6 @@ public class QueueService {
             queuerRepository.save(q);
             return;
         }
-
         logger.info("Opponent Found, creating match");
     }
 

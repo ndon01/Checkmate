@@ -44,6 +44,7 @@ public class MatchController {
         Optional<Match> match = matchRepository.findActiveMatchByUserId(decodedJWT.getClaim("userId").asLong());
 
         if (match.isEmpty()) {
+            matchService.debugUserMatches(decodedJWT.getClaim("userId").asLong());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No active match found.");
         }
 

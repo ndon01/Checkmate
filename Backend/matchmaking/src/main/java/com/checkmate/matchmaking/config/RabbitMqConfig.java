@@ -35,50 +35,44 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(matchmakingMatchEventQueue).to(matchEventExchange);
     }
 
-    public static final String MATCHMAKING_MICROSERVICE_QUEUE = UUID.randomUUID().toString();
-    public static final String MATCHMAKING_MICROSERVICE_EXCHANGE = "matchmaking_microservice_exchange";
+    public static final String MATCHMAKING_MICROSERVICE_DIRECT_QUEUE = "matchmaking_microservice_direct_queue";
+    public static final String MATCHMAKING_MICROSERVICE_DIRECT_EXCHANGE = "matchmaking_microservice_direct_exchange";
 
     @Bean
-    Queue matchmakingMicroserviceQueue() {
-        return new Queue(MATCHMAKING_MICROSERVICE_QUEUE, true);
+    Queue matchmakingMicroserviceDirectQueue() {
+        return new Queue(MATCHMAKING_MICROSERVICE_DIRECT_QUEUE, false, false, true);
     }
 
     @Bean
-    DirectExchange matchmakingMicroserviceExchange() {
-        return new DirectExchange(MATCHMAKING_MICROSERVICE_EXCHANGE);
+    DirectExchange matchmakingMicroserviceDirectExchange() {
+        return new DirectExchange(MATCHMAKING_MICROSERVICE_DIRECT_EXCHANGE);
     }
 
     @Bean
-    Binding bindingMatchmakingMicroservice(Queue matchmakingMicroserviceQueue, DirectExchange matchmakingMicroserviceExchange) {
-        return BindingBuilder.bind(matchmakingMicroserviceQueue).to(matchmakingMicroserviceExchange).withQueueName();
+    Binding bindingMatchmakingMicroservice(Queue matchmakingMicroserviceDirectQueue, DirectExchange matchmakingMicroserviceDirectExchange) {
+        return BindingBuilder.bind(matchmakingMicroserviceDirectQueue).to(matchmakingMicroserviceDirectExchange).withQueueName();
     }
 
     // Match Microservice Direct
 
-    public static final String MATCH_MICROSERVICE_QUEUE = "match_microservice_queue";
     public static final String MATCH_MICROSERVICE_EXCHANGE = "match_microservice_exchange";
+    @Bean
+    FanoutExchange matchMicroserviceExchange() {
+        return new FanoutExchange(MATCH_MICROSERVICE_EXCHANGE);
+    }
 
-    @Bean
-    Queue matchMicroserviceQueue() {
-        return new Queue(MATCH_MICROSERVICE_QUEUE, true);
-    }
-    @Bean
-    DirectExchange matchMicroserviceExchange() {
-        return new DirectExchange(MATCH_MICROSERVICE_EXCHANGE);
-    }
-    @Bean
-    Binding bindingMatchMicroservice(Queue matchMicroserviceQueue, DirectExchange matchMicroserviceExchange) {
-        return BindingBuilder.bind(matchMicroserviceQueue).to(matchMicroserviceExchange).withQueueName();
-    }
+
 
 
     // Queues
     public static final String MATCHMAKING_USER_EVENTS_QUEUE = "matchmaking_user_events_queue";
+
+    public static final String USER_EVENTS_QUEUE = "user_events_queue";
     public static final String USER_EVENTS_EXCHANGE = "user_events_exchange";
 
     @Bean
     Queue userEventsQueue() {
-        return new Queue(MATCHMAKING_USER_EVENTS_QUEUE);
+        return new Queue(USER_EVENTS_QUEUE, false, false, true);
     }
 
     // Fanout Exchange for User Events
@@ -91,6 +85,12 @@ public class RabbitMqConfig {
     @Bean
     Binding bindingUserEvents(Queue userEventsQueue, FanoutExchange userEventsExchange) {
         return BindingBuilder.bind(userEventsQueue).to(userEventsExchange);
+    }
+
+    public static final String MATCH_MICROSERVICE_DIRECT_EXCHANGE = "match_microservice_direct_exchange";
+    @Bean
+    DirectExchange matchMicroserviceDirectExchange() {
+        return new DirectExchange(MATCH_MICROSERVICE_DIRECT_EXCHANGE);
     }
 
     // JSON Message Converter

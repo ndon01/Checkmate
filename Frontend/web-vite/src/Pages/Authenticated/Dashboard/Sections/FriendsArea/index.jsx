@@ -106,6 +106,7 @@ export const FriendsArea = () => {
                                             backgroundColor: 'white',
                                             paddingTop: '25px',
                                             paddingBottom: '25px',
+                                            marginInline: '10px',
                                             borderRadius: '10px',
                                             boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
                                             border: '1px solid rgba(0, 0, 0, 0.1)',
