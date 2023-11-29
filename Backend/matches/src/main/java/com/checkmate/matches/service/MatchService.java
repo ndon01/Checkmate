@@ -245,6 +245,7 @@ public class MatchService {
 
     public boolean makeMove(long userID, String move) {
         Board myBoard = new Board();
+        long now = Instant.now().getEpochSecond();
 
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userID);
         if (optionalMatch.isEmpty()) {
@@ -279,7 +280,7 @@ public class MatchService {
         String endState = myBoard.stringMaker();
         thisMatch.setCurrentBoard(endState);
         thisMatch.setMatchMoves(thisMatch.getMatchMoves() + move + ",");
-        long now = Instant.now().getEpochSecond();
+
         long timeTaken = now - thisMatch.getLastMoveTime();
         if (userID == thisMatch.getWhiteUserId()) {
             long newTime = thisMatch.getWhiteTimeLeft() - timeTaken;
