@@ -2,16 +2,19 @@ import React, {useEffect} from 'react';
 import NavigationBar from "@/Components/NavigationBar/NavigationBar.jsx";
 import {FooterArea} from "@/Components/General/FooterArea/index.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
-import {Skeleton, Box, Typography, Grid, Button} from "@mui/material";
+import {Skeleton, Box, Typography, Grid, Button, Link} from "@mui/material";
 import {useNavigate, useParams} from "react-router-dom";
 
 
 import styles from './UserProfile.module.css';
+import {useUser} from "@/Contexts/UserContext.jsx";
 
 const UserProfile = () => {
     const params = useParams();
     const navigate = useNavigate();
     const {userId} = params;
+
+    const {currentUser} = useUser();
 
     const [userData, setUserData] = React.useState({
         userId: 1,
@@ -210,8 +213,10 @@ const UserProfile = () => {
                 {/* First Section */}
                 <Box style={{
                     width: '100vw',
-                    height: '100vh',
+                    minHeight: '100vh',
                 }}>
+
+                    <div style={{height: '50px'}}></div>
 
                     <div style={{
                         display: 'flex',
@@ -305,8 +310,7 @@ const UserProfile = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {!userData.ownProfile && (
+                        {(!userData.ownProfile && currentUser) && (
                         <div style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -383,7 +387,23 @@ const UserProfile = () => {
                                 )}
                             </div>
                         </div>)}
+
+                        {!currentUser && (
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginTop: '25px',
+                                backgroundColor: 'lightgray',
+                                borderRadius: '25px',
+                                padding: '25px'
+                            }}>
+                                <Button component={Link} href={`/login?redirect=${document.location.pathname}`}>Login</Button> or <Button component={Link} href={`/register?redirect=${document.location.pathname}`}>Register</Button> to interact with {userData.username}.
+                            </div>
+                        )}
                     </div>
+                    <div style={{height: '50px'}}></div>
 
                 </Box>
             </MainArea>

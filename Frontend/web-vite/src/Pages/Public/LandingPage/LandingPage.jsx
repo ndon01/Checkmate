@@ -19,6 +19,11 @@ function LandingPage() {
         <>
             <NavigationBar/>
             <MainArea>
+                <div style={{width: "100vw", height: "110vh", position: 'absolute', top: '-5vh', zIndex: 0}}  >
+
+                    <TwinklingStars width={'100px'} height={'100px'}/>
+
+                </div>
                 <Container
                     maxWidth="100%"
                     style={{
@@ -55,11 +60,6 @@ function LandingPage() {
                         </Box>
                     </Box>
                 </Container>
-                <div style={{width: "100vw", height: "100vh", position: 'absolute', top: '0px', zIndex: 0}}  >
-
-                    <TwinklingStars width={'100px'} height={'100px'}/>
-
-                </div>
             </MainArea>
         </>
     );

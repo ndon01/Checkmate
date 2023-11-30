@@ -74,7 +74,7 @@ function Authenticated() {
                                     top: "1px",
                                     left: ".5px",
                                     fontSize: "18px"
-                                }}>{currentUser.username[0].toUpperCase()}</span>
+                                }}>{currentUser?.username && currentUser.username[0].toUpperCase() || ''}</span>
                             </Box>
                         </IconButton>
                         <Menu
@@ -95,8 +95,11 @@ function Authenticated() {
                             }}>Settings</MenuItem>
 
                             <MenuItem onClick={() => {
-                                logoutUser()
-                                navigate('/')
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('refresh_token');
+                                localStorage.removeItem('context');
+                                logoutUser();
+                                navigate('/');
 
                             }}>Logout</MenuItem>
                         </Menu>

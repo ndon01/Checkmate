@@ -7,12 +7,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth_db
     expose:
-      - "5000"
-    ports:
-      - '5000:5432'
+      - "5432"
     volumes:
-      - authentication-database:/var/lib/postgresql/data
+      - authentication-database-volume:/var/lib/postgresql/data
 
   user-database:
     image: postgres:14.1-alpine
@@ -20,10 +19,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5001:5432'
+      - POSTGRES_DB=user_db
+    expose:
+      - "5432"
     volumes:
-      - user-database:/var/lib/postgresql/data # Fixed the volume name here
+      - user-database-volume:/var/lib/postgresql/data
 
   matchmaking-database:
     image: postgres:14.1-alpine
@@ -31,10 +31,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5002:5432'
+      - POSTGRES_DB=matchmaking_db
+    expose:
+      - "5432"
     volumes:
-      - matchmaking-database:/var/lib/postgresql/data # Fixed the volume name here
+      - matchmaking-database-volume:/var/lib/postgresql/data
 
   match-database:
     image: postgres:14.1-alpine
@@ -42,24 +43,97 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5003:5432'
+      - POSTGRES_DB=match_db
+    expose:
+      - "5432"
     volumes:
-      - match-database:/var/lib/postgresql/data # Fixed the volume name here
-
+      - match-database-volume:/var/lib/postgresql/data
 
   rabbitmq:
     image: "rabbitmq:management"
     ports:
-      - "15672:15672" # management UI
-      - "5672:5672"   # default RabbitMQ broker port
+      - "15672:15672"
+      - "5672:5672"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-volume:/var/lib/rabbitmq
 
+  discovery-server:
+    build: ./Backend/discovery-server
+    volumes:
+      - discovery-server-volume:/app
+    ports:
+      - "8761:8761"
+  gateway-server:
+    build: ./Backend/gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+    volumes:
+      - gateway-server-volume:/app
+
+  authentication:
+    build: ./Backend/authentication
+    depends_on:
+      - discovery-server
+      - rabbitmq
+      - authentication-database
+    volumes:
+      - authentication-service-volume:/app
+
+  users:
+    build: ./Backend/users
+    depends_on:
+      - discovery-server
+      - rabbitmq
+      - user-database
+    volumes:
+      - users-service-volume:/app
+
+  matchmaking:
+    build: ./Backend/matchmaking
+    depends_on:
+      - discovery-server
+      - rabbitmq
+      - matchmaking-database
+    volumes:
+      - matchmaking-service-volume:/app
+
+  matches:
+    build: ./Backend/matches
+    depends_on:
+      - discovery-server
+      - rabbitmq
+      - match-database
+    volumes:
+      - matches-service-volume:/app
+
+  notification:
+    build: ./Backend/notifications
+    depends_on:
+      - discovery-server
+      - rabbitmq
+    volumes:
+      - notification-service-volume:/app
+
+  frontend:
+    build: ./Frontend/web-vite
+    ports:
+      - "3000:80"
 
 volumes:
-  authentication-database:
-  user-database: # Fixed the volume name here
-  matchmaking-database:
-  match-database:
+  authentication-database-volume:
+  user-database-volume:
+  matchmaking-database-volume:
+  match-database-volume:
+  rabbitmq-volume:
+  discovery-server-volume:
+  gateway-server-volume:
+  authentication-service-volume:
+  users-service-volume:
+  matchmaking-service-volume:
+  matches-service-volume:
+  notification-service-volume:

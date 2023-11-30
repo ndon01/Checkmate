@@ -34,7 +34,7 @@ public class RabbitMqConfig {
 
     @Bean
     Queue matchMicroserviceQueue() {
-        return new Queue(MATCH_MICROSERVICE_QUEUE, false, false, true);
+        return new Queue(MATCH_MICROSERVICE_QUEUE, true);
     }
     @Bean
     FanoutExchange matchMicroserviceExchange() {

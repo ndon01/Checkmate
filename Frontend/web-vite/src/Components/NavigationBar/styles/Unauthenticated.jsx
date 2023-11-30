@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import imgUrl from '@/Assets/CheckmateLogo.png';
 import {useUser} from "@/Contexts/UserContext.jsx";
+import * as path from "path";
 
 function Authenticated() {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -57,7 +58,7 @@ function Authenticated() {
 
 
                     <div style={{ position: 'absolute', right: '25px', height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
-                        <Button color="inherit" component={Link} to="/login">
+                        <Button color="inherit" component={Link} to={`/login?redirect=${document.location.pathname}`}>
                             Login
                         </Button>
                         <Button color="inherit" component={Link} to="/register">

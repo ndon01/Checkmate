@@ -15,110 +15,40 @@ export const UserProvider = ({children}) => {
     const {createAlert} = useAlertContext();
     const navigate = useNavigate();
 
-    const checkContextValidity = async () => {
-        const storedRefreshToken = localStorage.getItem('refresh_token');
-        const storedAccessToken = localStorage.getItem('access_token');
+    async function refreshContext() {
+        const storedAccess = localStorage.getItem("access_token");
 
-        const lastRefreshTime = localStorage.getItem("lastRefresh");
-        const lastAccessTime = localStorage.getItem("lastAccess");
-
-        let hasRefreshToken = storedRefreshToken != null;
-        let hasRefreshTokenDate = lastRefreshTime != null;
-        let useRefreshToken = false;
-
-        let hasAccessToken = storedAccessToken != null;
-
-        if (hasRefreshToken) {
-            if (hasRefreshTokenDate) {
-                let now = new Date();
-                let lastRefresh = new Date(lastRefreshTime);
-                let diff = now.getTime() - lastRefresh.getTime();
-                let minutes = Math.floor(diff / 60000);
-                let days = Math.floor(minutes / 1440);
-
-                if (minutes >= 10) {
-                    useRefreshToken = true;
-                }
-            } else {
-                useRefreshToken = true;
-            }
+        if (storedAccess == null) {
+            return refreshAccessToken();
         }
 
-        if (useRefreshToken) {
-            const refreshResponse = await fetch("http://localhost:8080/api/auth/refresh", {
-                method: "GET",
-                headers: {
-                    'Authorization': 'Refresh ' + storedRefreshToken
-                }
-            });
-
-            if (!refreshResponse.ok) {
-                logoutUser();
-                hasAccessToken = false;
-                hasRefreshToken = false;
-            } else {
-                const responseData = await refreshResponse.json();
-                localStorage.setItem('refresh_token', responseData.refreshToken);
-                localStorage.setItem('access_token', responseData.accessToken);
-                localStorage.setItem("lastRefresh", new Date().getTime());
-                localStorage.setItem("lastAccess", new Date().getTime());
+        const response = await fetch("http://localhost:8080/api/users/getUserContext", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + storedAccess
             }
-        }
-
-
-
-        if (hasRefreshToken && hasAccessToken) {
-            console.log("has refresh token and access token");
-            const storedUserContext = localStorage.getItem('context');
-            const lastContextTime = localStorage.getItem("lastContext");
-            let hasUserContext = storedUserContext !== null && storedUserContext !== "null";
-            let getUserContext = false;
-            if (hasUserContext) {
-                if (lastContextTime == null) {
-                    getUserContext = true;
-                } else {
-                    let now = new Date();
-                    let lastContext = new Date(lastContextTime);
-                    let diff = now.getTime() - lastContext.getTime();
-                    let minutes = Math.floor(diff / 60000);
-
-                    if (minutes >= 5) {
-                        getUserContext = true;
-                    }
-                }
-
-            } else {
-                getUserContext = true;
-            }
-
-            if (getUserContext) {
-                const contextResponse = await fetch("http://localhost:8080/api/users/getUserContext", {
-                    method: "GET",
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-                    }
-                });
-
-                if (!contextResponse.ok) {
-                    logoutUser();
-                    createAlert("Session Error, Please Log In Again", "error");
-                } else {
-                    const responseData = await contextResponse.json();
-                    localStorage.setItem('context', JSON.stringify(responseData));
-                    localStorage.setItem("lastContext", new Date().getTime());
-                    setCurrentUser(responseData);
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(data => {
+                    setCurrentUser(data);
                     setIsAuthenticated(true);
-                }
+                })
             } else {
-                setCurrentUser(JSON.parse(storedUserContext));
-                setIsAuthenticated(true);
+                refreshAccessToken();
             }
-        }
-    };
+        });
+    }
 
-    function refreshAccessToken() {
+    async function refreshAccessToken() {
         const storedRefreshToken = localStorage.getItem('refresh_token');
-        fetch("http://localhost:8080/api/auth/refresh", {
+        if (storedRefreshToken == null) {
+            setIsAuthenticated(false);
+            setCurrentUser(null);
+            navigate("/login");
+            return;
+        }
+
+        await fetch("http://localhost:8080/api/auth/refresh", {
             method: "GET",
             headers: {
                 Authorization: "Refresh " + storedRefreshToken
@@ -126,14 +56,13 @@ export const UserProvider = ({children}) => {
         }).then(response => {
             if (response.ok) {
                 response.json().then(data => {
-                    localStorage.setItem("refresh_token", data.refreshToken)
+                    localStorage.setItem("refresh_token", data.refreshToken);
                     localStorage.setItem("access_token", data.accessToken);
-                    localStorage.setItem("lastRefresh", new Date().getTime());
-                    localStorage.setItem("lastAccess", new Date().getTime());
+                    localStorage.setItem("lastAccess", new Date().getTime().toString());
 
-                    localStorage.removeItem("context");
-                    checkContextValidity();
-                });
+                    // refresh context
+                    refreshContext();
+                })
             } else {
                 logoutUser();
             }
@@ -141,12 +70,29 @@ export const UserProvider = ({children}) => {
     }
 
     useEffect(() => {
-        // Immediately invoke the async function
-        refreshAccessToken();
 
-        setInterval(() => {
-            refreshAccessToken();
+        let refreshInterval = setInterval(() => {
+            if (localStorage.getItem("lastAccess") == null) {
+                return;
+            }
+
+            if (localStorage.getItem("refresh_token") == null) {
+                return;
+            }
+
+            const lastAccess = parseInt(localStorage.getItem("lastAccess"));
+
+            const currentTime = new Date().getTime();
+            const timeSinceLastAccess = currentTime - lastAccess;
+
+            if (timeSinceLastAccess > 55 * 60 * 1000) {
+                refreshAccessToken();
+            }
         }, 60000);
+
+        return () => {
+            clearInterval(refreshInterval);
+        }
     }, []); // Empty dependency array ensures this useEffect runs once, similar to componentDidMount
 
 
@@ -194,33 +140,29 @@ export const UserProvider = ({children}) => {
         localStorage.setItem("access_token", access)
         localStorage.setItem("lastRefresh", new Date().getTime());
         localStorage.setItem("lastAccess", new Date().getTime());
-        checkContextValidity();
+        refreshContext();
     };
 
     const logoutUser = () => {
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('context');
         setCurrentUser(null);
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("lastRefresh");
+        localStorage.removeItem("lastAccess");
         setIsAuthenticated(false);
-        createAlert("Successfully Logged Out")
+        navigate("/login");
     };
 
     useEffect(() => {
-        localStorage.setItem("context", JSON.stringify(currentUser));
+        if (currentUser == null) {
+            setIsAuthenticated(false);
+        } else {
+            localStorage.setItem("context", JSON.stringify(currentUser));
+        }
     }, [currentUser]);
-
-    useEffect(() => {
-        // refresh token
-        const interval = setInterval(() => {
-            checkContextValidity();
-        }, 720000)
-    }, []);
-
 
     const value = {
         setCurrentUser,
-        checkContextValidity,
         sendRequest,
         currentUser,
         isAuthenticated,

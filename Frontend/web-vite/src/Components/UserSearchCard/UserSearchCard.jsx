@@ -47,7 +47,7 @@ export const UserSearchCard = ({userId, username, displayName}) => {
 
                                                     <span style={{
                                                         fontSize: '32px'
-                                                    }}>{username[0].toUpperCase()}</span>
+                                                    }}>{username[0]?.toUpperCase()}</span>
 
                         </div>
                         <div style={{

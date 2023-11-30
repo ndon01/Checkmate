@@ -12,14 +12,16 @@ import {
 } from '@mui/material';
 import NavigationBar from '../../../Components/NavigationBar/NavigationBar.jsx';
 import { FooterArea } from '@/Components/General/FooterArea/index.jsx';
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
+import TwinklingStars from "@/Components/TwinklingStars.jsx";
 
 const LoginPage = () => {
 
   const {createAlert} = useAlertContext();
+    const [searchParams] = useSearchParams();
 
   const {
       currentUser,
@@ -55,6 +57,7 @@ const LoginPage = () => {
       console.log("Submitting login")
       // New form errors object
       const errors = {};
+      const redirect = searchParams.get('redirect');
 
       let errored = false;
       // Basic validations
@@ -97,9 +100,16 @@ const LoginPage = () => {
               createAlert("Login Failed", "error")
 
           } else {
-            navigate("/dashboard")
-            createAlert("Login Successful")
-            loginUser(responseData[0], responseData[1])
+
+              // if redirect is set, redirect to that pa
+              if (redirect) {
+                  console.log("redirecting to " + redirect)
+                  navigate(redirect)
+              } else {
+                    navigate("/")
+              }
+              createAlert("Login Successful")
+              loginUser(responseData[0], responseData[1])
           }
 
           // Handle the response data as needed
@@ -125,7 +135,12 @@ const LoginPage = () => {
         <>
           <NavigationBar/>
           <MainArea>
-            <div style={{height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <div style={{width: "100vw", height: "110vh", position: 'absolute', top: '-5vh', zIndex: 0}}  >
+
+              <TwinklingStars width={'100px'} height={'100px'}/>
+
+          </div>
+            <div style={{height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <Box
                     style={{
                       width: '500px',
@@ -136,6 +151,7 @@ const LoginPage = () => {
                       padding: '20px',
                       display: 'flex',
                       flexDirection: 'column',
+                        zIndex: 1
                     }}
                 >
 

@@ -4,7 +4,7 @@ import {Box} from "@mui/system";
 
 import {useState} from "react";
 
-import styles from './settings.module.css'
+import styles from './Settings.module.css'
 import {Account} from "@/Pages/Authenticated/Settings/pages/Account";
 import {Security} from "@/Pages/Authenticated/Settings/pages/Security/index.jsx";
 import {Privacy} from "@/Pages/Authenticated/Settings/pages/Privacy/index.jsx";

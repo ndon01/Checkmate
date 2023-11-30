@@ -173,20 +173,20 @@ public class CredentialsService {
         DecodedJWT decodedJWT = TokenUtil.validateToken(token);
 
         if (decodedJWT == null) {
-            throw new RuntimeException("Authentication Failure: Invalid Token.");
+            return null;
         }
 
         Long userId = decodedJWT.getClaim("userId").asLong();
         String jwtId = decodedJWT.getId();
 
         if (userId == null || jwtId == null) {
-            throw new RuntimeException("Authentication Failure: Invalid Token.");
+            return null;
         }
 
         Optional<UserCredential> userCredentialOptional = credentialsRepository.findByCredentialId(userId);
 
         if (userCredentialOptional.isEmpty()) {
-            throw new RuntimeException("Authentication Failure: Invalid Token.");
+            return null;
         }
 
         UserCredential userCredential = userCredentialOptional.get();

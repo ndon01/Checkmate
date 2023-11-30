@@ -1,8 +1,8 @@
+// Nicholas Donahue 2023
 package com.checkmate.matches.model.util.Game;
-import com.checkmate.matches.model.util.Pieces.*;
 
-public class Move
-{
+import com.checkmate.matches.model.util.Pieces.Piece;
+public class Move {
     // Variables to store the start and end positions of the move
     private int row0, col0; // Starting position
     private int row1, col1; // Ending position
@@ -20,10 +20,10 @@ public class Move
         assert (move.length() == 4); // Asserting that the move string is of correct length
         this.move = move;
         // Parsing the move string to get row and column indices
-        row0 = move.charAt(1)  - 49;
-        row1 = move.charAt(3) - 49;
-        col0 = move.charAt(0) - 97;
-        col1 = move.charAt(2) - 97;
+        row0 = 8 - move.charAt(1) + '0';
+        row1 = 8 - move.charAt(3) + '0';
+        col0 = move.charAt(0) - 'a';
+        col1 = move.charAt(2) - 'a';
 
         // Initializing piece-related variables
         movedPieceType = null;
@@ -70,11 +70,6 @@ public class Move
             return Piece.createPiece(capturedPieceType, capturedPieceWhite);
         }
         return null;
-    }
-
-    public boolean getMovedPieceIsWhite()
-    {
-        return movedPieceWhite;
     }
 
     // Method to return a string representation of the move

@@ -30,7 +30,6 @@ public class TokenUtil {
                     .build();
             return verifier.verify(token);
         } catch (JWTDecodeException exception) {
-            logger.error("Invalid token: {}", exception.getMessage());
             return null;
         }
     }
