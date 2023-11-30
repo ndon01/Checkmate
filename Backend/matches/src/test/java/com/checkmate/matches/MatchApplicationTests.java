@@ -2,21 +2,23 @@ package com.checkmate.matches;
 
 import com.checkmate.matches.model.util.Game.Game;
 import com.checkmate.matches.model.util.Game.Move;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 class MatchApplicationTests {
 
     // Test
     public static void main(String[] args) {
-        Game myBoard = new Game("Alice", "Bob");
+        Game myGame = new Game("rnbqkbnr/7p/8/8/8/8/PPPPPPPP/RNBQKBNR", false);
+        Move myMove = new Move("h7h6");
 
-        Move myMove = new Move("h6h5");
+        myGame.printStatus();
 
-
-        boolean moveWorked = myBoard.move(myMove);
+        boolean moveWorked = myGame.move(myMove);
 
         System.out.println(moveWorked);
+
+        myGame.printStatus();
+
+        System.out.println(myGame.getBoardNotation());
     }
 
 }

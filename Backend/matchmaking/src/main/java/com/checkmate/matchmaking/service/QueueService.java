@@ -63,6 +63,7 @@ public class QueueService {
     private Queuer findOpponent(Queuer searchingFor, int minElo, int maxElo) {
         Queuer opponent = queuerRepository.findOpponent(searchingFor.getUserId(), minElo, maxElo);
 
+        System.out.println(opponent);
         // no opponent found, return null
         if (opponent == null) {
             return null;
@@ -70,6 +71,8 @@ public class QueueService {
 
         // opponent was inactive, find another
         if ((Long.parseLong(opponent.getLastPing()) - System.currentTimeMillis()) > 30000) {
+            opponent.setInQueue(false);
+            queuerRepository.saveAndFlush(opponent);
             return findOpponent(searchingFor, minElo, maxElo);
         }
 

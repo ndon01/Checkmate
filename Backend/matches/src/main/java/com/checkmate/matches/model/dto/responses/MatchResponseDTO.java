@@ -19,6 +19,7 @@ public class MatchResponseDTO {
     private Boolean isDraw;
 
 
+    private Long winnerUserId;
     private Boolean drawRequested;
     private Long drawRequesterId;
 

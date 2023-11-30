@@ -22,15 +22,28 @@ public class Piece {
 
         // Checks if the piece at the destination is of the same color
         Piece captured = game.getPiece(move.getRow1(), move.getCol1());
-        if (captured != null && captured.white == this.white)
-            return false; // Move is illegal if it tries to capture a piece of the same color
-
-        return true; // If none of the above conditions are met, the move is considered legal
+        return captured == null || captured.white != this.white; // Move is illegal if it tries to capture a piece of the same color
+// If none of the above conditions are met, the move is considered legal
     }
 
     // Method to get the type of the piece
     public String getPieceType() {
         return PieceType; // Returns the type of the piece
+    }
+
+    public String getPieceNotation() {
+        String pType = getPieceType();
+        if (pType.equals("Knight")) {
+            pType = "N";
+        } else {
+            pType = pType.substring(0, 1);
+        }
+
+        if (isWhite()) {
+            return pType.substring(0, 1);
+        } else {
+            return pType.substring(0, 1).toLowerCase();
+        }
     }
 
     // Constructor to initialize a piece with its color and type

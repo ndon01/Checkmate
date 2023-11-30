@@ -103,6 +103,7 @@ public class MatchController {
         matchResponseDTO.setBlackTimeRemaining(match.getBlackTimeLeft());
         matchResponseDTO.setIsWhiteTurn(match.getIsWhiteTurn());
 
+        matchResponseDTO.setWinnerUserId(match.getWinnerUserId());
         return matchResponseDTO;
     }
 

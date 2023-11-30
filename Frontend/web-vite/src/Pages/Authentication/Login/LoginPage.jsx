@@ -16,6 +16,7 @@ import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
+import TwinklingStars from "@/Components/TwinklingStars.jsx";
 
 const LoginPage = () => {
 
@@ -134,7 +135,12 @@ const LoginPage = () => {
         <>
           <NavigationBar/>
           <MainArea>
-            <div style={{height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <div style={{width: "100vw", height: "110vh", position: 'absolute', top: '-5vh', zIndex: 0}}  >
+
+              <TwinklingStars width={'100px'} height={'100px'}/>
+
+          </div>
+            <div style={{height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <Box
                     style={{
                       width: '500px',
@@ -145,6 +151,7 @@ const LoginPage = () => {
                       padding: '20px',
                       display: 'flex',
                       flexDirection: 'column',
+                        zIndex: 1
                     }}
                 >
 

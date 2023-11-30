@@ -214,12 +214,13 @@ public class MatchService {
 
 
     public boolean makeMove(String matchId, long userIdS, String move) {
-        System.out.println("makeMove called by " + userIdS + " with move " + move);
+        System.out.println("makeMove on match " + matchId + " called by " + userIdS + " with move " + move);
 
         // If the game doesn't exist, we can't do anything
         Optional<Match> optionalMatch = matchRepository.findMatchByMatchId(Long.valueOf(matchId));
 
         if (optionalMatch.isEmpty()) {
+            logger.info("Match " + matchId + " doesn't exist");
             return false;
         }
 
@@ -227,26 +228,31 @@ public class MatchService {
 
         // If the game is finished, we can't do anything
         if (match.isFinished()) {
+            logger.info("Match " + matchId + " is finished");
             return false;
         }
 
         if (match.getMatchStatus() != Match.MatchStatus.PROGRESS) {
+            logger.info("Match " + matchId + " is not in progress");
             return false;
         }
 
         // If the user isn't in the game, we can't do anything
 
         if (match.getWhiteUserId() != Long.valueOf(userIdS) && match.getBlackUserId() != Long.valueOf(userIdS)) {
+            logger.info("User " + userIdS + " is not in match " + matchId);
             return false;
         }
 
         // if if its not the user's turn, we can't do anything
 
-        if (match.getIsWhiteTurn() && match.getWhiteUserId() != Long.valueOf(userIdS)) {
+        if (match.getIsWhiteTurn() && match.getWhiteUserId() != userIdS) {
+            logger.info("User " + userIdS + " is not white in match " + matchId);
             return false;
         }
 
-        if (!match.getIsWhiteTurn() && match.getBlackUserId() != Long.valueOf(userIdS)) {
+        if (!match.getIsWhiteTurn() && match.getBlackUserId() != userIdS) {
+            logger.info("User " + userIdS + " is not black in match " + matchId);
             return false;
         }
 
@@ -254,11 +260,11 @@ public class MatchService {
 
         logger.info("Making move " + move);
 
-        Game myBoard = Game.newBoard(match.getCurrentBoard(), match.getIsWhiteTurn());
+        Game myBoard = new Game(match.getCurrentBoard(), match.getIsWhiteTurn());
 
-        myBoard.setTurn(match.getIsWhiteTurn());
+        myBoard.setWhiteTurn(match.getIsWhiteTurn());
 
-        myBoard.boardMaker(match.getCurrentBoard());
+        myBoard.printStatus();
 
         Move myMove = new Move(move);
         boolean moveWorked = myBoard.move(myMove);
@@ -269,7 +275,7 @@ public class MatchService {
 
         logger.info("Move " + move + " succeeded");
 
-        String endState = myBoard.stringMaker();
+        String endState = myBoard.getBoardNotation();
 
         logger.info("End state: " + endState);
 
@@ -287,6 +293,20 @@ public class MatchService {
 
         match.setIsWhiteTurn(!match.getIsWhiteTurn());
         match.setLastMoveTime(now);
+
+        if (!endState.contains("k")) {
+            match.setMatchStatus(Match.MatchStatus.FINISHED);
+            match.setWinnerUserId(match.getWhiteUserId());
+            match.setFinished(true);
+            match.setMatchEndTime(Instant.now().getEpochSecond());
+        }
+
+        if (!endState.contains("K")) {
+            match.setMatchStatus(Match.MatchStatus.FINISHED);
+            match.setWinnerUserId(match.getBlackUserId());
+            match.setFinished(true);
+            match.setMatchEndTime(Instant.now().getEpochSecond());
+        }
 
         matchRepository.saveAndFlush(match);
         return true;

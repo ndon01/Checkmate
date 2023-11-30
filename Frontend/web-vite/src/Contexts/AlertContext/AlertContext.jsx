@@ -20,9 +20,10 @@ export const AlertProvider = ({ children }) => {
     }, 500); // Match this with the animation duration in CSS
   }
 
-  const createAlert = (message, severity = 'success', duration = 5000) => {
+  const createAlert = (message, severity= 'success', duration = 5000) => {
     const id = new Date().getTime();
     setAlerts((prevAlerts) => [...prevAlerts, { id, message, severity, removing: false }]);
+
     setTimeout(() => {
       removeAlert(id);
     }, duration);
@@ -44,12 +45,12 @@ export const AlertProvider = ({ children }) => {
                     alignItems: 'center'
                   }}
               >
-                { alert.severity == "success" ? <TaskAlt style={{
+                { alert.severity === "success" ? <TaskAlt style={{
                   marginInline: '10px',
                   color: 'green'
                 }}/> : null }
 
-                { alert.severity == "error" ? <Error style={{
+                { alert.severity === "error" ? <Error style={{
                   marginInline: '10px',
                   color: 'red'
                 }}/> : null }

@@ -3,11 +3,15 @@ package com.checkmate.matches.model.util.Game;
 
 import com.checkmate.matches.model.util.Pieces.*;
 import com.checkmate.matches.model.util.PrintableTable.PrintableTable;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class Game {
+    @Getter
+    @Setter
     private String player1, player2;
     private ArrayList<Move> moves;
     private Square[][] board;
@@ -18,20 +22,40 @@ public class Game {
 
     private boolean Winner = false;
 
+    //specifies whose turn it is: white/player1 or black/player2
+    @Getter
+    @Setter
+    private boolean whiteTurn = true;
+
     public boolean getWinnerStatus() {
         return Winner;
     }
 
-    public boolean isWhiteTurn() {//specifies whose turn it is: white/player1 or black/player2
-        return moves.size() % 2 == 0;
-    }
 
-    public String getPlayer1() {
-        return player1;
-    }
+    public String getBoardNotation() {
+        String notation = "";
+        for (int row = 0; row < 8; row++) {
+            int emptyCount = 0;
+            for (int col = 0; col < 8; col++) {
+                if (board[row][col].getOccupant() == null) {
+                    emptyCount++;
+                } else {
+                    if (emptyCount > 0) {
+                        notation += emptyCount;
+                        emptyCount = 0;
+                    }
 
-    public String getPlayer2() {
-        return player2;
+                    notation += board[row][col].getOccupant().getPieceNotation();
+                }
+            }
+            if (emptyCount > 0) {
+                notation += emptyCount;
+            }
+            if (row != 7) {
+                notation += "/";
+            }
+        }
+        return notation;
     }
 
     public Game(String currentBoard, boolean isWhiteMove) {
@@ -39,27 +63,100 @@ public class Game {
         this.player2 = "";
         moves = new ArrayList<>();
         board = new Square[8][8];
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                boolean white = (row + col) % 2 == 0;
-                if (row == 1)
-                    board[row][col] = new Square(white, new Pawn(false));
-                else if (row == 6)
-                    board[row][col] = new Square(white, new Pawn(true));
-                else if (row == 7 || row == 0) {
-                    if (col == 0 || col == 7)
-                        board[row][col] = new Square(white, new Rook(row == 7));
-                    else if (col == 1 || col == 6)
-                        board[row][col] = new Square(white, new Knight(row == 7));
-                    else if (col == 2 || col == 5)
-                        board[row][col] = new Square(white, new Bishop(row == 7));
-                    else if (col == 3)
-                        board[row][col] = new Square(white, new Queen(row == 7));
-                    else
-                        board[row][col] = new Square(white, new King(row == 7));
-                } else
-                    board[row][col] = new Square(white, null);
+
+        setWhiteTurn(isWhiteMove);
+
+        int col = 0;
+        int row = 0;
+
+        char[] boardArray = currentBoard.toCharArray();
+        for (char character : boardArray) {
+            if (character == '/') {
+                row++;
+                col = 0;
             }
+
+            if (character == 'P') {
+                board[row][col] = new Square(false, new Pawn(true));
+                col++;
+                continue;
+            }
+
+            if (character == 'p') {
+                board[row][col] = new Square(true, new Pawn(false));
+                col++;
+                continue;
+            }
+
+            if (character == 'R') {
+                board[row][col] = new Square(false, new Rook(true));
+                col++;
+                continue;
+            }
+
+            if (character == 'r') {
+                board[row][col] = new Square(true, new Rook(false));
+                col++;
+                continue;
+            }
+
+            if (character == 'N') {
+                board[row][col]  = new Square(false, new Knight(true));
+                col++;
+                continue;
+            }
+
+            if (character == 'n') {
+                board[row][col]  = new Square(true, new Knight(false));
+                col++;
+                continue;
+            }
+
+            if (character == 'B') {
+                board[row][col]  = new Square(false, new Bishop(true));
+                col++;
+                continue;
+            }
+
+            if (character == 'b') {
+                board[row][col]  = new Square(true, new Bishop(false));
+                col++;
+                continue;
+            }
+
+            if (character == 'Q') {
+                board[row][col]  = new Square(false, new Queen(true));
+                col++;
+                continue;
+            }
+
+            if (character == 'q') {
+                board[row][col]  = new Square(true, new Queen(false));
+                col++;
+                continue;
+            }
+
+            if (character == 'K') {
+                board[row][col]  = new Square(false, new King(true));
+                col++;
+                continue;
+            }
+
+            if (character == 'k') {
+                board[row][col]  = new Square(true, new King(false));
+                col++;
+                continue;
+            }
+
+            // if it is a number
+               if (Character.isDigit(character)) {
+                 int emptySquares = Character.getNumericValue(character);
+                 for (int i = 0; i < emptySquares; i++) {
+                      board[row][col] = new Square((row + col) % 2 == 0, null);
+                      col++;
+                 }
+                }
+
         }
     }
 
@@ -92,17 +189,13 @@ public class Game {
         }
     }
 
-    public boolean move(Move m) {
-        return move(m, false);
-    }
-
-    public boolean move(Move move, boolean isCapture) { // makes a move, returns true if successful, false otherwise.
+    public boolean move(Move move) { // makes a move, returns true if successful, false otherwise.
         Square src = board[move.getRow0()][move.getCol0()], dst = board[move.getRow1()][move.getCol1()];
-        if (isCapture && dst.getOccupant() == null) return false;
-        if (!isCapture && dst.getOccupant() != null) return false;
 
-        if (src.getOccupant() == null || //empty src square
-                !board[move.getRow0()][move.getCol0()].getOccupant().isLegal(move,this))//illegal move
+        if (src.getOccupant() == null)
+            return false; //empty src square
+
+        if (!board[move.getRow0()][move.getCol0()].getOccupant().isLegal(move,this)) //illegal move
             return false;
 
         boolean isWhite = src.getOccupant().isWhite();

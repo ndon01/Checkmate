@@ -3,6 +3,7 @@ package com.checkmate.authentication.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.checkmate.authentication.exceptions.UnauthorizedException;
 import com.checkmate.authentication.model.dto.requests.LoginRequestDTO;
+import com.checkmate.authentication.model.dto.responses.LoginResponseDTO;
 import com.checkmate.authentication.model.dto.responses.RefreshResponseDTO;
 import com.checkmate.authentication.model.dto.responses.UserContextResponseDTO;
 import com.checkmate.authentication.model.entity.UserCredential;
@@ -13,6 +14,7 @@ import com.checkmate.authentication.repository.UserTokensRepository;
 import com.checkmate.authentication.service.CredentialsService;
 import com.checkmate.authentication.service.TokenService;
 import com.checkmate.authentication.util.TokenUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -52,10 +54,27 @@ public class TokenController {
             err.setMessage("Authentication Failure");
             return ResponseEntity.status(409).body(err);
         }
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
 
         // login attempt will return credentials
         // create response entity
+
+        String refreshToken = loginAttempt[0];
+        String accessToken = loginAttempt[1];
+
+        loginResponseDTO.setRefreshToken(refreshToken);
+        loginResponseDTO.setAccessToken(accessToken);
+
+        // Create cookies for the tokens
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // Expires in 7 days
+
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setMaxAge(30 * 60); // Expires in 30 minutes
+
+        // Add cookies to response
+        response.addCookie(refreshTokenCookie);
+        response.addCookie(accessTokenCookie);
 
         return ResponseEntity.status(201).body(loginAttempt);
     }

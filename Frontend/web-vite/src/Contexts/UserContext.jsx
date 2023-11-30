@@ -145,8 +145,6 @@ localStorage.setItem("lastRefresh", new Date().getTime().toString());
     }
 
     useEffect(() => {
-        // Immediately invoke the async function
-        refreshAccessToken();
 
         setInterval(() => {
             refreshAccessToken();
@@ -202,12 +200,6 @@ localStorage.setItem("lastRefresh", new Date().getTime().toString());
     };
 
     const logoutUser = () => {
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("context");
-        localStorage.removeItem("lastRefresh");
-        localStorage.removeItem("lastAccess");
-        localStorage.removeItem("lastContext");
         setCurrentUser(null);
         setIsAuthenticated(false);
         createAlert("Successfully Logged Out")
@@ -221,7 +213,7 @@ localStorage.setItem("lastRefresh", new Date().getTime().toString());
         // refresh token
         const interval = setInterval(() => {
             checkContextValidity();
-        }, 720000)
+        }, 5000)
     }, []);
 
 

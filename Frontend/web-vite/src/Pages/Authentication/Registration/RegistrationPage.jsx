@@ -17,6 +17,7 @@ import {useUser} from "@/Contexts/UserContext.jsx";
 import response from "assert";
 import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
+import TwinklingStars from "@/Components/TwinklingStars.jsx";
 
 const RegistrationPage = () => {
 
@@ -197,7 +198,12 @@ const RegistrationPage = () => {
             <NavigationBar />
 
             <MainArea>
-                <div style={{height: "max-content", paddingBlock: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <div style={{width: "100vw", height: "110vh", position: 'absolute', top: '-5vh', zIndex: 0}}  >
+
+                    <TwinklingStars width={'100px'} height={'100px'}/>
+
+                </div>
+                <div style={{height: "70vh", paddingBlock: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
                 <Box
                     style={{
@@ -209,6 +215,7 @@ const RegistrationPage = () => {
                         padding: '20px',
                         display: 'flex',
                         flexDirection: 'column',
+                        zIndex: 1
                     }}
                 >
 
