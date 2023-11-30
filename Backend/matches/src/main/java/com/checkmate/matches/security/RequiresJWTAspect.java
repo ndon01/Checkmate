@@ -43,11 +43,8 @@ public class RequiresJWTAspect {
 
         // Check if token is valid
         if (decodedJWT == null) {
-            System.out.println("Invalid Authorization token.");
             return ResponseEntity.status(401).body("Invalid Authorization token.");
         }
-
-        System.out.println("Valid JWT token.");
 
         request.setAttribute("decodedJWT", decodedJWT);
 

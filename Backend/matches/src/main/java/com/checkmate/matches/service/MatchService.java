@@ -6,7 +6,7 @@ import com.checkmate.matches.controller.MatchController;
 import com.checkmate.matches.model.entity.Match;
 import com.checkmate.matches.model.rabbitmq.MatchEventDTO;
 import com.checkmate.matches.model.rabbitmq.MatchEventType;
-import com.checkmate.matches.model.util.Game.Board;
+import com.checkmate.matches.model.util.Game.Game;
 import com.checkmate.matches.model.util.Game.Move;
 import com.checkmate.matches.repository.MatchRepository;
 import com.checkmate.matches.*;
@@ -67,14 +67,31 @@ public class MatchService {
 
     public Match pingMatch(long matchId, long userId) {
         Optional<Match> optionalMatch = matchRepository.findById(matchId);
+        // match doesnt exist
         if (optionalMatch.isEmpty()) {
             return null;
         }
 
         Match thisMatch = optionalMatch.get();
 
-        if (thisMatch.isFinished()) {
-            return null;
+        // match is finished
+        if (thisMatch.getMatchStatus() == Match.MatchStatus.FINISHED) {
+            return thisMatch;
+        }
+
+        // match is abandoned
+        if (thisMatch.isAbandoned()) {
+            return thisMatch;
+        }
+
+        // match is forfeited
+        if (thisMatch.isForfeited()) {
+            return thisMatch;
+        }
+
+        // match is draw
+        if (thisMatch.isDraw()) {
+            return thisMatch;
         }
 
         if (thisMatch.getWhiteUserId() == userId) {
@@ -85,60 +102,14 @@ public class MatchService {
             thisMatch = matchRepository.saveAndFlush(thisMatch);
         }
 
-        if ((Instant.now().getEpochSecond() - thisMatch.getLastMoveTime()) > 30000 && (thisMatch.getMatchStatus() != Match.MatchStatus.PENDING || thisMatch.getMatchMoves().isEmpty()) || thisMatch.getMatchMoves().length() == 5) {
-            thisMatch.setAbandoned(true);
-            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
-            finishMatch(thisMatch);
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-        if (thisMatch.getBlackTimeLeft() <= 0 || thisMatch.getWhiteTimeLeft() <= 0) {
-            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
-            finishMatch(thisMatch);
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-        if (thisMatch.getMatchStatus() == Match.MatchStatus.FINISHED) {
-            thisMatch.setFinished(true);
-            finishMatch(thisMatch);
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-        // if length is zero and match is progress and it has been 30 seconds, abandon the match
-        if (thisMatch.getMatchStatus() != Match.MatchStatus.PENDING && thisMatch.getMatchMoves().isEmpty() && (Instant.now().getEpochSecond() - thisMatch.getLastMoveTime()) > 30000) {
-            thisMatch.setAbandoned(true);
-            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
-            finishMatch(thisMatch);
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-        if (thisMatch.getMatchStatus() != Match.MatchStatus.PENDING && thisMatch.getMatchMoves().length() == 5 && (Instant.now().getEpochSecond() - thisMatch.getLastMoveTime()) > 30000) {
-            thisMatch.setAbandoned(true);
-            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
-            finishMatch(thisMatch);
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-        // if both users have pinged and not started, start the match
-        if (thisMatch.getMatchStatus() == Match.MatchStatus.PENDING && thisMatch.getLastWhitePing() != null && thisMatch.getLastBlackPing() != null) {
+        // start the match if both users have pinged and match is pending
+        if (thisMatch.getLastWhitePing() != null && thisMatch.getLastBlackPing() != null && thisMatch.getMatchStatus() == Match.MatchStatus.PENDING) {
             thisMatch.setMatchStatus(Match.MatchStatus.PROGRESS);
-            thisMatch.setLastMoveTime(Instant.now().getEpochSecond());
+            thisMatch.setMatchStartTime(Instant.now().getEpochSecond());
+            thisMatch = matchRepository.saveAndFlush(thisMatch);
         }
 
-        if (!thisMatch.getCurrentBoard().contains("k")) {
-            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
-            thisMatch.setWinnerUserId(thisMatch.getBlackUserId());
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-        if (!thisMatch.getCurrentBoard().contains("K")) {
-            thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
-            thisMatch.setWinnerUserId(thisMatch.getBlackUserId());
-            return matchRepository.saveAndFlush(thisMatch);
-        }
-
-
-        return matchRepository.saveAndFlush(thisMatch);
+        return thisMatch;
     }
 
     public void finishMatch(Match match) {
@@ -239,60 +210,85 @@ public class MatchService {
         matchRepository.saveAndFlush(myMatch);
         return true;
 
-
     }
 
 
-    public boolean makeMove(long userID, String move) {
-        Board myBoard = new Board();
+    public boolean makeMove(String matchId, long userIdS, String move) {
+        System.out.println("makeMove called by " + userIdS + " with move " + move);
 
-        Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userID);
+        // If the game doesn't exist, we can't do anything
+        Optional<Match> optionalMatch = matchRepository.findMatchByMatchId(Long.valueOf(matchId));
+
         if (optionalMatch.isEmpty()) {
             return false;
         }
-        Match thisMatch = optionalMatch.get();
-        boolean isTurn = true;
 
-        if (thisMatch.getIsWhiteTurn() == true) {
-            if (thisMatch.getWhiteUserId() == userID) {
-                isTurn = true;
-            }
+        Match match = optionalMatch.get();
 
-        } else {
-            if (thisMatch.getBlackUserId() == userID) {
-                isTurn = true;
-            }
-
-        }
-
-        if (!isTurn) {
+        // If the game is finished, we can't do anything
+        if (match.isFinished()) {
             return false;
         }
 
-        myBoard.boardMaker(thisMatch.getCurrentBoard());
+        if (match.getMatchStatus() != Match.MatchStatus.PROGRESS) {
+            return false;
+        }
+
+        // If the user isn't in the game, we can't do anything
+
+        if (match.getWhiteUserId() != Long.valueOf(userIdS) && match.getBlackUserId() != Long.valueOf(userIdS)) {
+            return false;
+        }
+
+        // if if its not the user's turn, we can't do anything
+
+        if (match.getIsWhiteTurn() && match.getWhiteUserId() != Long.valueOf(userIdS)) {
+            return false;
+        }
+
+        if (!match.getIsWhiteTurn() && match.getBlackUserId() != Long.valueOf(userIdS)) {
+            return false;
+        }
+
+        // If the move is invalid, we can't do anything
+
+        logger.info("Making move " + move);
+
+        Game myBoard = Game.newBoard(match.getCurrentBoard(), match.getIsWhiteTurn());
+
+        myBoard.setTurn(match.getIsWhiteTurn());
+
+        myBoard.boardMaker(match.getCurrentBoard());
+
         Move myMove = new Move(move);
         boolean moveWorked = myBoard.move(myMove);
-        if (moveWorked == false) {
+        if (!moveWorked) {
+            logger.info("Move " + move + " failed");
             return false;
         }
 
+        logger.info("Move " + move + " succeeded");
+
         String endState = myBoard.stringMaker();
-        thisMatch.setCurrentBoard(endState);
-        thisMatch.setMatchMoves(thisMatch.getMatchMoves() + move + ",");
+
+        logger.info("End state: " + endState);
+
+        match.setCurrentBoard(endState);
+        match.setMatchMoves(match.getMatchMoves() + move + ",");
         long now = Instant.now().getEpochSecond();
-        long timeTaken = now - thisMatch.getLastMoveTime();
-        if (userID == thisMatch.getWhiteUserId()) {
-            long newTime = thisMatch.getWhiteTimeLeft() - timeTaken;
-            thisMatch.setWhiteTimeLeft(newTime);
+        long timeTaken = now - match.getLastMoveTime();
+        if (userIdS == match.getWhiteUserId()) {
+            long newTime = match.getWhiteTimeLeft() - timeTaken;
+            match.setWhiteTimeLeft(newTime);
         } else {
-            long newTime = thisMatch.getBlackTimeLeft() - timeTaken;
-            thisMatch.setWhiteTimeLeft(newTime);
+            long newTime = match.getBlackTimeLeft() - timeTaken;
+            match.setWhiteTimeLeft(newTime);
         }
 
-        thisMatch.setIsWhiteTurn(!thisMatch.getIsWhiteTurn());
-        thisMatch.setLastMoveTime(now);
+        match.setIsWhiteTurn(!match.getIsWhiteTurn());
+        match.setLastMoveTime(now);
 
-        matchRepository.saveAndFlush(thisMatch);
+        matchRepository.saveAndFlush(match);
         return true;
 
         //get current match

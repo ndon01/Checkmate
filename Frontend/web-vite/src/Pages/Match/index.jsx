@@ -24,7 +24,26 @@ export const Match = () => {
         setCurrentUser(JSON.parse(localStorage.getItem("context")));
     }
 
-    const [matchData, setMatchData] = React.useState({});
+    const [matchData, setMatchData] = React.useState({
+        matchId: "",
+        whiteUserId: "",
+        blackUserId: "",
+        whiteTimeLeft: 0,
+        blackTimeLeft: 0,
+        currentBoard: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+        isWhiteTurn: false,
+        matchStatus: ""
+    });
+
+    const [whiteTimeLeft, setWhiteTimeLeft] = React.useState(0);
+    const [blackTimeLeft, setBlackTimeLeft] = React.useState(0);
+    const [currentBoard, setCurrentBoard] = React.useState("");
+    const [whiteTurn, setWhiteTurn] = React.useState(false);
+    const [whiteUserId, setWhiteUserId] = React.useState(0);
+    const [blackUserId, setBlackUserId] = React.useState(0);
+
+    const [whiteUser, setWhiteUser] = React.useState({});
+    const [blackUser, setBlackUser] = React.useState({});
 
 
     useEffect(() => {
@@ -36,6 +55,57 @@ export const Match = () => {
         return () => clearInterval(interval);
     }, []); // Empty dependency array to run only on mount and unmount
 
+
+    // Fetch Player Data
+
+    useEffect(() => {
+
+        fetch(`http://localhost:8080/api/users/getUserProfile?userId=${whiteUserId}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("access_token")
+            }
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(data => {
+                    setWhiteUser(data)
+                })
+            } else {
+                setWhiteUser({
+                    username: "Anonymous"
+                })
+                console.log(response);
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+
+    }, [whiteUserId])
+
+    useEffect(() => {
+
+        fetch(`http://localhost:8080/api/users/getUserProfile?userId=${blackUserId}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("access_token")
+            }
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(data => {
+                    setBlackUser(data);
+                })
+            } else {
+                setBlackUser({
+                    username: "Anonymous"
+                })
+                console.log(response);
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+
+    }, [blackUserId])
+
     function fetchMatchData() {
         fetch(`http://localhost:8080/api/matches/pingMatch?matchId=${matchId}`, {
             method: "POST",
@@ -45,11 +115,47 @@ export const Match = () => {
             },
         }).then(response => {
             if (response.ok) {
-                response.json().then(data => {
+                response.json().then(newData => {
                     // Update state only if the turn or match status has changed
-                    if (data.whiteTurn !== matchData.whiteTurn || data.matchStatus !== matchData.matchStatus) {
-                        setMatchData(data);
-                    }
+                    setMatchData(prevState => {
+                        // Create a copy of the previous state
+                        let updatedState = {...prevState};
+
+                        // Iterate over the keys of the new data
+                        for (let key in newData) {
+                            // Update only if the value has changed
+                            if (newData[key] !== prevState[key]) {
+
+                                if (key === "whiteTurn") {
+                                    setWhiteTurn(newData[key]);
+                                }
+
+                                if (key === "whiteTimeRemaining") {
+                                    setWhiteTimeLeft(newData[key]);
+                                }
+
+                                if (key === "blackTimeRemaining") {
+                                    setBlackTimeLeft(newData[key]);
+                                }
+
+                                if (key === "currentBoard") {
+                                    setCurrentBoard(newData[key]);
+                                }
+
+                                if (key === "whiteUserId") {
+                                    setWhiteUserId(newData[key]);
+                                }
+
+                                if (key === "blackUserId") {
+                                    setBlackUserId(newData[key]);
+                                }
+
+                                updatedState[key] = newData[key];
+                            }
+                        }
+
+                        return updatedState;
+                    });
                 })
             } else {
                 console.log(response)
@@ -64,11 +170,12 @@ export const Match = () => {
     // timer countdown
     React.useEffect(() => {
         const interval = setInterval(() => {
-            if (matchData.whiteTimeLeft <= 0 || matchData.blackTimeLeft <= 0) {
+            if (whiteTimeLeft <= 0 || blackTimeLeft <= 0) {
                 clearInterval(interval);
+                return;
             }
 
-            if (matchData.matchStatus === "FINISHED") {
+            if (matchData.matchStatus === "FINISHED" || matchData.finished === true) {
                 clearInterval(interval);
             }
 
@@ -77,24 +184,18 @@ export const Match = () => {
             }
 
             console.log("in progress")
-            if (matchData.whiteTurn) {
-                setMatchData(prevState => ({
-                    ...prevState,
-                    whiteTimeLeft: prevState.whiteTimeLeft - 1
-                }))
+            console.log("white turn: " + matchData.isWhiteTurn)
+            if (matchData.isWhiteTurn === true) {
+                setWhiteTimeLeft(prevState => prevState - 1);
             } else {
-
-                setMatchData(prevState => ({
-                    ...prevState,
-                    blackTimeLeft: prevState.blackTimeLeft - 1
-                }))
+                setBlackTimeLeft(prevState => prevState - 1);
             }
         }, 1000)
 
-        console.log(matchData.whiteTurn, matchData.whiteTimeLeft, matchData.blackTimeLeft)
+        console.log(whiteTurn, whiteTimeLeft, blackTimeLeft)
 
         return () => clearInterval(interval);
-    }, [[matchData.whiteTurn, matchData.whiteTimeLeft, matchData.blackTimeLeft]])
+    }, [whiteTimeLeft, blackTimeLeft])
 
     function secondsToMinutesSeconds(seconds) {
         const minutes = Math.floor(seconds / 60);
@@ -110,21 +211,55 @@ export const Match = () => {
     function isDraggablePiece({piece}) {
         let pieceColor = piece.startsWith("w") ? "white" : "black";
 
-        if (pieceColor === "white" && matchData.whiteUserId === currentUser.userId && matchData.whiteTurn) {
+        if (pieceColor === "white" && matchData.whiteUserId === currentUser?.userId && whiteTurn) {
             return true;
-        } else return pieceColor === "black" && matchData.blackUserId === currentUser.userId && !matchData.whiteTurn;
+        } else return pieceColor === "black" && matchData.blackUserId === currentUser?.userId && !whiteTurn;
     }
 
-    console.log(matchData)
-    console.log(currentUser)
+    function formatMatchData(data) {
+        return (
+            <div className={styles.matchDataContainer}>
+                {Object.entries(data).map(([key, value]) => (
+                    <div key={key} className={styles.matchDataItem}>
+                        <strong>{key}:</strong> {JSON.stringify(value)}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+
+    function dropPiece(sourceSquare, targetSquare) {
+        console.log(sourceSquare, targetSquare);
+        let success = false;
+        fetch(`http://localhost:8080/api/matches/makeMove?matchId=${matchData.matchId}&move=${sourceSquare}${targetSquare}`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("access_token"),
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log("Piece moved successfully!");
+                success = true;
+            } else {
+                console.log(response);
+                success = false;
+            }
+        })
+
+        return success;
+    }
+
 
     return (
         <>
             <NavigationBar/>
 
             <MainArea>
-                {JSON.stringify(currentUser)}
-                {JSON.stringify(matchData)}
+                {currentUser && formatMatchData(currentUser) || null}
+                {formatMatchData(matchData)}
+                {formatMatchData(whiteUser)}
+                {formatMatchData(blackUser)}
                 <div className={styles.pageContainer}>
                     <div className={styles.pageHeader}>
                         <span className={styles.pageTitle}>Nick vs Jack</span>
@@ -135,16 +270,36 @@ export const Match = () => {
                                 width: `${chessBoardSize}px`
                             }}>
                                 <div className={styles.playerUsernameContainer}>
-                                    {(matchData.whiteTurn && matchData.whiteUserId != currentUser.userId) ? <Circle/> :
-                                        <CircleOutlined/>}<span style={
-                                    {
+
+                                    {/* Current user exists and is white user and it is his turn or he is black user and it is his turn else default to white*/}
+
+                                    {blackUserId === currentUser?.userId && matchData.isWhiteTurn ? <Circle style={{
+                                        marginRight: '10px'
+                                    }}/>: null}
+
+                                    {blackUserId === currentUser?.userId && !matchData.isWhiteTurn ? <CircleOutlined style={{
+                                        marginRight: '10px'
+                                    }}/> : null}
+
+                                    {blackUserId !== currentUser?.userId && !matchData.isWhiteTurn ? <Circle style={{
+                                        marginRight: '10px'
+                                    }}/>: null}
+
+                                    {blackUserId !== currentUser?.userId && matchData.isWhiteTurn ? <CircleOutlined style={{
+                                        marginRight: '10px'
+                                    }}/>: null}
+
+
+                                    <span style={{
                                         fontSize: '16px',
                                         fontFamily: 'Inter',
                                         fontWeight: 'bold',
-                                        marginLeft: '10px'
-                                    }
-                                }>Opponent <span style={{fontWeight: 'normal'}}>(1200)</span>
+                                    }}>
+                                        {blackUserId === currentUser?.userId ? whiteUser.username : blackUser.username}
+
+                                        <span style={{fontWeight: 'normal', marginLeft: '10px'}}>(1200)</span>
                                     </span>
+
                                 </div>
                                 <div className={styles.timerContainer}>
                                     <span style={
@@ -154,7 +309,7 @@ export const Match = () => {
                                             fontWeight: 'bold'
                                         }
                                     }>
-                                        {secondsToMinutesSeconds(matchData.blackUserId !== currentUser.userId ? matchData.blackTimeLeft : matchData.whiteTimeLeft)}
+                                       {secondsToMinutesSeconds( currentUser?.userId === matchData.blackUserId ? whiteTimeLeft : blackTimeLeft)}
                                     </span>
                                 </div>
                             </div>
@@ -162,8 +317,9 @@ export const Match = () => {
                                 <Chessboard
 
                                     boardWidth={chessBoardSize}
-                                    boardOrientation={matchData.whiteUserId === currentUser.userId ? 'white' : 'black'}
+                                    boardOrientation={matchData.blackUserId === currentUser?.userId ? 'black' : 'white'}
                                     isDraggablePiece={isDraggablePiece}
+                                    onPieceDrop={dropPiece}
                                     showBoardNotation={true}
                                     position={matchData.currentBoard}
 
@@ -173,15 +329,35 @@ export const Match = () => {
                                 width: `${chessBoardSize}px`
                             }}>
                                 <div className={styles.playerUsernameContainer}>
-                                    {(matchData.whiteTurn && matchData.whiteUserId === currentUser.userId) ? <Circle/> :
-                                        <CircleOutlined/>}<span style={
-                                    {
+
+                                    {/* Current user exists and is white user and it is his turn or he is black user and it is his turn else default to white*/}
+
+                                    {(blackUserId === currentUser?.userId && !matchData.isWhiteTurn) && <Circle style={{
+                                        marginRight: '10px'
+                                    }}/>}
+
+                                    {blackUserId === currentUser?.userId && matchData.isWhiteTurn && <CircleOutlined style={{
+                                        marginRight: '10px'
+                                    }}/>}
+
+                                    {blackUserId !== currentUser?.userId && matchData.isWhiteTurn && <Circle style={{
+                                        marginRight: '10px'
+                                    }}/>}
+
+                                    {blackUserId !== currentUser?.userId && !matchData.isWhiteTurn && <CircleOutlined style={{
+                                        marginRight: '10px'
+                                    }}/>}
+
+                                    <span style={{
                                         fontSize: '16px',
                                         fontFamily: 'Inter',
                                         fontWeight: 'bold',
-                                        marginLeft: '10px'
-                                    }
-                                }>You <span style={{fontWeight: 'normal'}}>(1200)</span>
+                                    }}>
+                                        {whiteUserId === currentUser?.userId && "You"}
+                                        {blackUserId === currentUser?.userId && "You"}
+                                        {!currentUser && whiteUser.username}
+
+                                        <span style={{fontWeight: 'normal', marginLeft: '10px'}}>(1200)</span>
                                     </span>
                                 </div>
                                 <div className={styles.timerContainer}>
@@ -192,7 +368,7 @@ export const Match = () => {
                                             fontWeight: 'bold'
                                         }
                                     }>
-                                        {secondsToMinutesSeconds(currentUser.userId === matchData.blackUserId ? matchData.blackTimeLeft : matchData.whiteTimeLeft)}
+                                        {secondsToMinutesSeconds(currentUser?.userId === matchData.blackUserId ? blackTimeLeft : whiteTimeLeft)}
                                     </span>
                                 </div>
                             </div>

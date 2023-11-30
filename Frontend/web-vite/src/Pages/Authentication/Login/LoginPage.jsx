@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import NavigationBar from '../../../Components/NavigationBar/NavigationBar.jsx';
 import { FooterArea } from '@/Components/General/FooterArea/index.jsx';
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import {useAlertContext} from "@/Contexts/AlertContext/AlertContext.jsx";
 import {useUser} from "@/Contexts/UserContext.jsx";
 import {MainArea} from "@/Components/General/MainArea.jsx";
@@ -20,6 +20,7 @@ import {MainArea} from "@/Components/General/MainArea.jsx";
 const LoginPage = () => {
 
   const {createAlert} = useAlertContext();
+    const [searchParams] = useSearchParams();
 
   const {
       currentUser,
@@ -55,6 +56,7 @@ const LoginPage = () => {
       console.log("Submitting login")
       // New form errors object
       const errors = {};
+      const redirect = searchParams.get('redirect');
 
       let errored = false;
       // Basic validations
@@ -97,9 +99,16 @@ const LoginPage = () => {
               createAlert("Login Failed", "error")
 
           } else {
-            navigate("/dashboard")
-            createAlert("Login Successful")
-            loginUser(responseData[0], responseData[1])
+
+              // if redirect is set, redirect to that pa
+              if (redirect) {
+                  console.log("redirecting to " + redirect)
+                  navigate(redirect)
+              } else {
+                    navigate("/")
+              }
+              createAlert("Login Successful")
+              loginUser(responseData[0], responseData[1])
           }
 
           // Handle the response data as needed

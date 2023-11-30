@@ -22,15 +22,12 @@ public class OptionalJWTAspect {
     @Around("@annotation(optionalJWT)")
     public Object validateAndPassJWT(ProceedingJoinPoint joinPoint, OptionalJWT optionalJWT) throws Throwable {
 
-        logger.info("OptionalJWT invoked...");
-
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String authorization = request.getHeader("Authorization");
 
         // Check if Authorization header is present and bearer token is there
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            System.out.println("Authorization token is missing or not Bearer.");
             return joinPoint.proceed();
         }
 
@@ -40,11 +37,8 @@ public class OptionalJWTAspect {
 
         // Check if token is valid
         if (decodedJWT == null) {
-            System.out.println("Invalid Authorization token.");
             return joinPoint.proceed();
         }
-
-        System.out.println("Valid JWT token.");
 
         request.setAttribute("decodedJWT", decodedJWT);
 

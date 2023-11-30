@@ -116,9 +116,12 @@ export const UserProvider = ({children}) => {
         }
     };
 
-    function refreshAccessToken() {
+    async function refreshAccessToken() {
         const storedRefreshToken = localStorage.getItem('refresh_token');
-        fetch("http://localhost:8080/api/auth/refresh", {
+        if (storedRefreshToken == null) {
+            return;
+        }
+        await fetch("http://localhost:8080/api/auth/refresh", {
             method: "GET",
             headers: {
                 Authorization: "Refresh " + storedRefreshToken
@@ -126,14 +129,15 @@ export const UserProvider = ({children}) => {
         }).then(response => {
             if (response.ok) {
                 response.json().then(data => {
-                    localStorage.setItem("refresh_token", data.refreshToken)
-                    localStorage.setItem("access_token", data.accessToken);
-                    localStorage.setItem("lastRefresh", new Date().getTime());
-                    localStorage.setItem("lastAccess", new Date().getTime());
+                    localStorage.setItem("refresh_token", data?.refreshToken);
+                    localStorage.setItem("access_token", data?.accessToken);
 
-                    localStorage.removeItem("context");
-                    checkContextValidity();
-                });
+
+localStorage.setItem("lastRefresh", new Date().getTime().toString());
+                    localStorage.setItem("lastRefresh", new Date().getTime().toString());
+
+                    localStorage.setItem("lastAccess", new Date().getTime().toString());
+                })
             } else {
                 logoutUser();
             }
@@ -198,9 +202,12 @@ export const UserProvider = ({children}) => {
     };
 
     const logoutUser = () => {
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('context');
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("context");
+        localStorage.removeItem("lastRefresh");
+        localStorage.removeItem("lastAccess");
+        localStorage.removeItem("lastContext");
         setCurrentUser(null);
         setIsAuthenticated(false);
         createAlert("Successfully Logged Out")

@@ -3,8 +3,10 @@ package com.checkmate.matches.controller;
 import com.checkmate.matches.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.checkmate.matches.model.dto.requests.createMatchRequestDTO;
+import com.checkmate.matches.model.dto.responses.MatchResponseDTO;
 import com.checkmate.matches.model.entity.Match;
 import com.checkmate.matches.repository.MatchRepository;
+import com.checkmate.matches.security.OptionalJWT;
 import com.checkmate.matches.security.PermissionRequired;
 import com.checkmate.matches.security.RequiresJWT;
 import com.checkmate.matches.service.MatchService;
@@ -52,9 +54,62 @@ public class MatchController {
     }
 
     @PostMapping("/pingMatch")
-    @RequiresJWT
+    @OptionalJWT
     @Transactional
     public ResponseEntity<?> pingMatch(@RequestParam("matchId") long matchId, HttpServletRequest request) {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        Match match;
+
+        if (decodedJWT != null) {
+
+            long userId = decodedJWT.getClaim("userId").asLong();
+
+            match = matchService.pingMatch(matchId, userId);
+
+
+        } else {
+            match = matchService.pingMatch(matchId, -1);
+        }
+
+        if (match == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Match not found.");
+        }
+
+        return ResponseEntity.ok(formatMatchResponseDTO(match));
+    }
+
+    private MatchResponseDTO formatMatchResponseDTO(Match match) {
+        MatchResponseDTO matchResponseDTO = new MatchResponseDTO();
+
+        matchResponseDTO.setMatchId(match.getMatchId());
+        matchResponseDTO.setMatchStatus(String.valueOf(match.getMatchStatus()));
+        matchResponseDTO.setMatchType(String.valueOf(match.getMatchType()));
+        matchResponseDTO.setMatchMoves(match.getMatchMoves());
+        matchResponseDTO.setIsFinished(match.isFinished());
+        matchResponseDTO.setIsAbandoned(match.isAbandoned());
+        matchResponseDTO.setIsForfeited(match.isForfeited());
+        matchResponseDTO.setIsRated(match.isRated());
+        matchResponseDTO.setIsDraw(match.isDraw());
+        matchResponseDTO.setDrawRequested(match.isDrawRequested());
+        matchResponseDTO.setDrawRequesterId(match.getDrawRequesterId());
+        matchResponseDTO.setIsWhiteTurn(match.getIsWhiteTurn());
+        matchResponseDTO.setCurrentBoard(match.getCurrentBoard());
+        matchResponseDTO.setLastWhitePing(match.getLastWhitePing());
+        matchResponseDTO.setLastBlackPing(match.getLastBlackPing());
+        matchResponseDTO.setWhiteUserId(match.getWhiteUserId());
+        matchResponseDTO.setBlackUserId(match.getBlackUserId());
+        matchResponseDTO.setWhiteTimeRemaining(match.getWhiteTimeLeft());
+        matchResponseDTO.setBlackTimeRemaining(match.getBlackTimeLeft());
+        matchResponseDTO.setIsWhiteTurn(match.getIsWhiteTurn());
+
+        return matchResponseDTO;
+    }
+
+    @PostMapping("/makeMove")
+    @RequiresJWT
+    public ResponseEntity<?> makeMove(@RequestParam("matchId") String matchId, @RequestParam("move") String move, HttpServletRequest request)
+    {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
 
         if (decodedJWT == null) {
@@ -63,17 +118,12 @@ public class MatchController {
 
         long userId = decodedJWT.getClaim("userId").asLong();
 
-        Match match = matchService.pingMatch(matchId, userId);
 
-        return ResponseEntity.ok(match);
-    }
+        boolean moveMade = matchService.makeMove(matchId, userId, move);
 
-    @PostMapping("/makeMove")
-    @RequiresJWT
-    public ResponseEntity<?> makeMove(HttpServletRequest request)
-    {
-        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
-
+        if (!moveMade) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid move.");
+        }
 
         return ResponseEntity.ok("Move made.");
 
