@@ -140,7 +140,7 @@ export const UserProvider = ({children}) => {
         localStorage.setItem("access_token", access)
         localStorage.setItem("lastRefresh", new Date().getTime());
         localStorage.setItem("lastAccess", new Date().getTime());
-        checkContextValidity();
+        refreshContext();
     };
 
     const logoutUser = () => {
@@ -161,17 +161,8 @@ export const UserProvider = ({children}) => {
         }
     }, [currentUser]);
 
-    useEffect(() => {
-        // refresh token
-        const interval = setInterval(() => {
-            checkContextValidity();
-        }, 5000)
-    }, []);
-
-
     const value = {
         setCurrentUser,
-        checkContextValidity,
         sendRequest,
         currentUser,
         isAuthenticated,

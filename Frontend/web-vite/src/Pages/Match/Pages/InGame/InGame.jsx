@@ -22,33 +22,35 @@ import styles from './match.module.css';
 import {useUser} from "@/Contexts/UserContext.jsx";
 import Play from "@/Pages/Authenticated/Play/index.jsx";
 
-export const InGame = ({matchData = {
-    "matchId": 37,
-    "whiteUserId": 3,
-    "blackUserId": 1,
-    "matchStatus": "PROGRESS",
-    "matchType": "BLITZ",
-    "matchMoves": "",
-    "isFinished": false,
-    "isAbandoned": false,
-    "isForfeited": false,
-    "isRated": true,
-    "isDraw": false,
-    "winnerUserId": null,
-    "drawRequested": false,
-    "drawRequesterId": null,
-    "isWhiteTurn": true,
-    "currentBoard": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-    "whiteTimeRemaining": 300,
-    "blackTimeRemaining": 300,
-    "lastWhitePing": 1701333997,
-    "lastBlackPing": 1701334260,
-    "lastMoveTime": null,
-    "whiteUser": {},
-    "blackUser": {}
-}}) => {
+export const InGame = ({
+                           matchData = {
+                               "matchId": 37,
+                               "whiteUserId": 3,
+                               "blackUserId": 1,
+                               "matchStatus": "PROGRESS",
+                               "matchType": "BLITZ",
+                               "matchMoves": "",
+                               "isFinished": false,
+                               "isAbandoned": false,
+                               "isForfeited": false,
+                               "isRated": true,
+                               "isDraw": false,
+                               "winnerUserId": null,
+                               "drawRequested": false,
+                               "drawRequesterId": null,
+                               "isWhiteTurn": true,
+                               "currentBoard": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+                               "whiteTimeRemaining": 300,
+                               "blackTimeRemaining": 300,
+                               "lastWhitePing": 1701333997,
+                               "lastBlackPing": 1701334260,
+                               "lastMoveTime": null,
+                               "whiteUser": {},
+                               "blackUser": {}
+                           }
+                       }) => {
     const navigate = useNavigate();
-    const {currentUser, checkContextValidity, setCurrentUser} = useUser();
+    const {currentUser, setCurrentUser} = useUser();
 
     const [matchId, setMatchId] = React.useState(matchData.matchId);
     const [whiteTurn, setWhiteTurn] = React.useState(matchData.isWhiteTurn);
@@ -381,12 +383,44 @@ export const InGame = ({matchData = {
         );
     }
 
+    function requestDraw() {
+        fetch(`http://localhost:8080/api/matches/requestDraw?matchId=${matchData.matchId}`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("access_token"),
+            }
+        })
+    }
+
+    function acceptDraw() {
+        fetch(`http://localhost:8080/api/matches/respondToDrawRequest?matchId=${matchData.matchId}&response=${true}`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("access_token"),
+            }
+        })
+    }
+
+    function denyDraw() {
+        fetch(`http://localhost:8080/api/matches/respondToDrawRequest?matchId=${matchData.matchId}&response=${false}`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("access_token"),
+            }
+        })
+    }
+
+    function resignMatch() {
+        fetch(`http://localhost:8080/api/matches/respondToDrawRequest?matchId=${matchData.matchId}&response=${true}`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("access_token"),
+            }
+        })
+    }
+
     return (
         <>
-
-            Board Orientation : {boardOrientation}
-            whiteUser: {JSON.stringify(whiteUser)}
-            blackUser: {JSON.stringify(blackUser)}
 
             <div className={styles.pageContainer}>
                 <div className={styles.mainContent}>
@@ -394,8 +428,12 @@ export const InGame = ({matchData = {
 
                         {
                             boardOrientation === "white"
-                            && <PlayerInfo DisplayName={blackUser.displayName || "Black Player"} Username={blackUser.username || "Black Player"} userId={blackUserId} timeLeft={blackTimeLeft} displayWinner={winnerUserId === blackUserId}/>
-                            || <PlayerInfo DisplayName={whiteUser.displayName || "White Player"} Username={whiteUser.username || "White Player"} userId={whiteUserId} timeLeft={whiteTimeLeft} displayWinner={winnerUserId === whiteUserId}/>
+                            && <PlayerInfo DisplayName={blackUser.displayName || "Black Player"}
+                                           Username={blackUser.username || "Black Player"} userId={blackUserId}
+                                           timeLeft={blackTimeLeft} displayWinner={winnerUserId === blackUserId}/>
+                            || <PlayerInfo DisplayName={whiteUser.displayName || "White Player"}
+                                           Username={whiteUser.username || "White Player"} userId={whiteUserId}
+                                           timeLeft={whiteTimeLeft} displayWinner={winnerUserId === whiteUserId}/>
                         }
 
                         <div style={{
@@ -407,7 +445,7 @@ export const InGame = ({matchData = {
                                         onPieceDrop={dropPiece}
                                         boardSize={chessBoardSize}
                                         boardOrientation={boardOrientation}
-                                        customBoardStyle	={{
+                                        customBoardStyle={{
                                             boxShadow: "1px 1px 4px 0px black",
                                             borderRadius: "5px",
                                         }}
@@ -416,10 +454,38 @@ export const InGame = ({matchData = {
 
                         {
                             boardOrientation === "black"
-                            && <PlayerInfo DisplayName={blackUser.displayName || "Black Player"} Username={blackUser.username || "Black Player"} userId={blackUserId} timeLeft={blackTimeLeft} displayWinner={winnerUserId === blackUserId}/>
-                            || <PlayerInfo DisplayName={whiteUser.displayName || "White Player"} Username={whiteUser.username || "White Player"} userId={whiteUserId} timeLeft={whiteTimeLeft} displayWinner={winnerUserId === whiteUserId}/>
+                            && <PlayerInfo DisplayName={blackUser.displayName || "Black Player"}
+                                           Username={blackUser.username || "Black Player"} userId={blackUserId}
+                                           timeLeft={blackTimeLeft} displayWinner={winnerUserId === blackUserId}/>
+                            || <PlayerInfo DisplayName={whiteUser.displayName || "White Player"}
+                                           Username={whiteUser.username || "White Player"} userId={whiteUserId}
+                                           timeLeft={whiteTimeLeft} displayWinner={winnerUserId === whiteUserId}/>
                         }
 
+                        {(currentUser && (currentUser.userId === whiteUserId || currentUser.userId === blackUserId)) && (
+
+                            <div style={{marginTop: '25px'}}>
+                                {
+                                    (matchData.drawRequested && matchData.drawRequesterId !== currentUser?.userId && ((currentUser?.userId === whiteUserId) || (currentUser?.userId === blackUserId))) && (
+                                        <>
+                                            <Button variant="contained" onClick={acceptDraw}>Accept Draw</Button>
+                                            <Button variant="contained" style={{
+                                                marginLeft: "1rem",
+                                            }} onClick={denyDraw}>Deny Draw</Button>
+                                        </>
+                                    )
+                                }
+                                {matchData.drawRequested && matchData.drawRequesterId === currentUser?.userId && (
+                                    <Button variant="contained" disabled>Draw Requested</Button>
+                                )}
+                                {!matchData.drawRequested && (
+                                    <Button variant="contained" onClick={requestDraw}>Request Draw</Button>
+                                )}
+                                <Button variant="contained" style={{
+                                    marginLeft: "1rem",
+                                }} onClick={resignMatch}>Resign this Match</Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

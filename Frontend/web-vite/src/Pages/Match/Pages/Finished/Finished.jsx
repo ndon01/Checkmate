@@ -50,7 +50,7 @@ export const Finished = ({
                              }
                          }) => {
     const navigate = useNavigate();
-    const {currentUser, checkContextValidity, setCurrentUser} = useUser();
+    const {currentUser, setCurrentUser} = useUser();
 
     const [matchId, setMatchId] = React.useState(matchData.matchId);
     const [whiteTurn, setWhiteTurn] = React.useState(matchData.isWhiteTurn);

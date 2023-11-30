@@ -7,7 +7,7 @@ import EditModal from "@/Components/EditModal.jsx";
 
 export const Account = () => {
 
-    const {setCurrentUser, sendRequest, currentUser, checkContextValidity} = useUser();
+    const {setCurrentUser, sendRequest, currentUser} = useUser();
 
     const [showEditDisplayName, setShowEditDisplayName] = useState(false)
     const [showEditUsername, setShowEditUsername] = useState(false)

@@ -130,11 +130,18 @@ public class MatchController {
 
     }
 
-    @PostMapping("/forfeitMatch")
+    @PostMapping("/resignMatch")
     @RequiresJWT
-    public ResponseEntity<?> forfeitMatch(HttpServletRequest request)
+    public ResponseEntity<?> forfeitMatch(@RequestParam("matchId") String matchId, HttpServletRequest request)
     {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+
+        boolean attempt = matchService.resignRequest(Long.parseLong(matchId), decodedJWT.getClaim("userId").asLong());
+
+        if (!attempt) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request.");
+        }
 
         return ResponseEntity.ok("Match forfeited.");
 
@@ -142,9 +149,15 @@ public class MatchController {
 
     @PostMapping("/requestDraw")
     @RequiresJWT
-    public ResponseEntity<?> requestDraw(HttpServletRequest request)
+    public ResponseEntity<?> requestDraw(@RequestParam("matchId") String matchId, HttpServletRequest request)
     {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        boolean attempt = matchService.drawRequest(Long.parseLong(matchId), decodedJWT.getClaim("userId").asLong());
+
+        if (!attempt) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request.");
+        }
 
         return ResponseEntity.ok("Draw request response received.");
 
@@ -152,9 +165,15 @@ public class MatchController {
 
     @PostMapping("/respondToDrawRequest")
     @RequiresJWT
-    public ResponseEntity<?> respondToDrawRequest(HttpServletRequest request)
+    public ResponseEntity<?> respondToDrawRequest(@RequestParam("matchId") String matchId, @RequestParam("response") boolean response, HttpServletRequest request)
     {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        boolean attempt = matchService.drawResponse(Long.parseLong(matchId), decodedJWT.getClaim("userId").asLong(), response);
+
+        if (!attempt) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request.");
+        }
 
         return ResponseEntity.ok("Draw request response received.");
 

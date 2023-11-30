@@ -29,9 +29,18 @@ This project is a supposed to be a sit where you can meet other people, and play
 To install Checkmate, follow these steps:
 1. Ensure you have Docker, Java OpenJDK 21 and Maven Installed on your system.
 2. Open up a new terminal where you want to install the project.
-3. Clone the repository using the command: `git clone https://github.com/ndon01/Checkmate.git`
-4. Navigate to the cloned directory using the command: `cd Checkmate`
-5. Now, navigate into the backend directory using the command: `cd backend`
+3. Clone the repository using the command:
+```bash
+git clone https://github.com/ndon01/Checkmate.git
+```
+4. Navigate to the cloned directory using the command:
+```bash
+cd Checkmate
+```
+5. Now, navigate into the backend directory using the command: 
+```bash
+cd Backend
+```
 5. You can either run this command, or run #7 and #8 separately
 ```bash
 mvn clean install
@@ -50,6 +59,6 @@ cd ..
 ```
 10. Finally, in the main directory, run the docker compose file using:
 ```bash
-docker-compose up
+docker-compose up --build
 ```
 11. The program should now be running on your machine.  You can access the frontend at http://localhost:3000 and the backend at http://localhost:8080

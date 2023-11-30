@@ -135,13 +135,21 @@ public class MatchService {
     }
 
 
-    public boolean resignRequest(long userId) {
-        Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
+    public boolean resignRequest(long matchId, long userId) {
+        Optional<Match> optionalMatch = matchRepository.findMatchByMatchId(matchId);
+
         if (optionalMatch.isEmpty()) {
             return false;
         }
 
         Match thisMatch = optionalMatch.get();
+
+        // is user in the match
+
+        if (thisMatch.getWhiteUserId() != userId && thisMatch.getBlackUserId() != userId) {
+            return false;
+        }
+
         boolean isWhite;
         long otherUser;
         if (thisMatch.getBlackUserId() == userId) {
@@ -154,18 +162,25 @@ public class MatchService {
 
         thisMatch.setForfeited(true);
         thisMatch.setWinnerUserId(otherUser);
+        thisMatch.setFinished(true);
+        thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
         matchRepository.saveAndFlush(thisMatch);
+        finishMatch(thisMatch);
         return true;
     }
 
-    public boolean drawResponse(long userId, boolean response) {
-        Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
+    public boolean drawResponse(long matchId, long userId, boolean response) {
+        Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(matchId);
         if (optionalMatch.isEmpty()) {
             return false;
         }
 
         Match thisMatch = optionalMatch.get();
 
+        // is user in match
+        if (thisMatch.getWhiteUserId() != userId && thisMatch.getBlackUserId() != userId) {
+            return false;
+        }
 
         if (!thisMatch.isDrawRequested()) {
             return false;
@@ -181,27 +196,35 @@ public class MatchService {
         }
 
         thisMatch.setDraw(true);
+        thisMatch.setFinished(true);
         thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
         matchRepository.saveAndFlush(thisMatch);
-
+        finishMatch(thisMatch);
         return true;
 
     }
 
-    public boolean drawRequest(long userId) {
-        Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(userId);
+    public boolean drawRequest(long matchId, long userId) {
+        Optional<Match> optionalMatch = matchRepository.findMatchByMatchId(matchId);
         if (optionalMatch.isEmpty()) {
             return false;
         }
 
         Match myMatch = optionalMatch.get();
 
+        // is user in match
+
+        if (myMatch.getWhiteUserId() != userId && myMatch.getBlackUserId() != userId) {
+            return false;
+        }
 
         if (myMatch.isDrawRequested() && myMatch.getDrawRequesterId() != userId) {
-
+            // draw is requested so accept it since mutual.
             myMatch.setDraw(true);
+            myMatch.setFinished(true);
             myMatch.setMatchStatus(Match.MatchStatus.FINISHED);
             matchRepository.saveAndFlush(myMatch);
+            finishMatch(myMatch);
             return true;
         }
 

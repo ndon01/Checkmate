@@ -31,7 +31,7 @@ export const Match = () => {
     const params = useParams();
     const {matchId} = params;
 
-    const {currentUser, checkContextValidity, setCurrentUser} = useUser();
+    const {currentUser, setCurrentUser} = useUser();
 
     const [matchData, setMatchData] = React.useState({
         "matchId": 37,
@@ -135,27 +135,6 @@ export const Match = () => {
             <NavigationBar/>
 
             <MainArea>
-
-                <div>
-                    Current User
-                    <div>
-                        {JSON.stringify(currentUser)}
-                    </div>
-                </div>
-
-                <div style={{
-                    marginTop: '1rem',
-                    marginLeft: '1rem',
-                }}>
-
-                    {Object.keys(matchData).map((key, index) => {
-                        return (
-                            <div key={index}>
-                                {key}: {matchData[key]}
-                            </div>
-                        )
-                    })}
-                </div>
 
                 {
                     matchData.matchStatus !== "FINISHED" && matchData.matchStatus !== "PROGRESS" &&
