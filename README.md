@@ -29,7 +29,16 @@ This project is a supposed to be a sit where you can meet other people, and play
  
 ## Showcase
 
-!(alt text)[]
+<img src="./Assets/LandingPage.png">
+<img src="./Assets/RegistrationPage.png">
+<img src="./Assets/LoginPage.png">
+<img src="./Assets/SearchPage.png">
+<img src="./Assets/SettingsPage.png">
+<img src="./Assets/ChangeSettings.png">
+<img src="./Assets/FriendRequests.png">
+<img src="./Assets/Dashboard.png">
+<img src="./Assets/SearchUsers.png">
+
 
 ## Installation
 To install Checkmate, follow these steps:
