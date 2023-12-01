@@ -1,7 +1,9 @@
 # Checkmate
 Java Springboot Microservices and React Based Online Chess Matchmaking web application.
+
 ## Description
 This project is a supposed to be a sit where you can meet other people, and play them in chess.  Have fun trying to rank up and ascend the ranks!
+
 ## Features
 - Authentication
     - Registration
@@ -24,6 +26,10 @@ This project is a supposed to be a sit where you can meet other people, and play
   - You can watch a replay of a previously played match
 - Notifications
   - You can setup notifications through email
+ 
+## Showcase
+
+!(alt text)[]
 
 ## Installation
 To install Checkmate, follow these steps:
