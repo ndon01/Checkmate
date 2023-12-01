@@ -25,6 +25,10 @@ public class User {
     @Column(name = "display_name")
     private String displayName;
 
+    //@Column(name = "Coins")
+    //private double coinTotal;
+
+
     @OneToOne
     @JoinColumn(name = "user_profile_id")
     private UserProfile userProfile;

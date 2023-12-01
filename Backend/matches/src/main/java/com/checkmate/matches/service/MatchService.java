@@ -32,6 +32,9 @@ public class MatchService {
     @Autowired
     private MatchRepository matchRepository;
 
+    //@Autowired
+    //private UserRepository userRepository;
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -114,6 +117,25 @@ public class MatchService {
 
     public void finishMatch(Match match) {
         // post to rabbitmq
+        //before finishing the match transfer coins
+        /*
+        long winnerID = match.getWinnerID();
+        long loserID;
+        if(winnerID == match.getWhiteUserID())
+        {
+            loserID = match.getBlackUserID();
+        }
+        else{ loserID = match.getWhiteUserID();}
+        Optional<User> optionalUser = userRepository.findUserbyUserID(winnerID);
+        User winner = optionalUser.get();
+        User loser = userRepository.findUserbyUserID(loserID).get();
+
+        winner.setCoins(winner.getCoins() + 100);
+        userRepository.saveAndFlush(winner);
+        loser.setCoins(loser.getCoins() -100);
+        userRepository.saveAndFlush(loser);
+        * */
+
 
         MatchEventDTO matchEventDTO = new MatchEventDTO();
         matchEventDTO.setEventType(MatchEventType.MATCH_FINISHED);
