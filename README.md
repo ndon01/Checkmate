@@ -29,35 +29,15 @@ This project is a supposed to be a sit where you can meet other people, and play
  
 ## Showcase
 
-<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-
-
-<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-
-
-<!-- Slideshow Container -->
-<div class="slideshow">
-  <div><img src="./Assets/LandingPage.png"></div>
-  <div><img src="./Assets/RegistrationPage.png"></div>
-  <div><img src="./Assets/LoginPage.png"></div>
-  <!-- Add more slides as needed -->
-</div>
-
-
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('.slideshow').slick({
-      // Add customization options here
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 2000,
-    });
-  });
-</script>
+<img src="./Assets/LandingPage.png">
+<img src="./Assets/RegistrationPage.png">
+<img src="./Assets/LoginPage.png">
+<img src="./Assets/SearchPage.png">
+<img src="./Assets/SettingsPage.png">
+<img src="./Assets/ChangeSettings.png">
+<img src="./Assets/FriendRequests.png">
+<img src="./Assets/Dashboard.png">
+<img src="./Assets/SearchUsers.png">
 
 
 ## Installation
