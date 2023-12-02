@@ -3,6 +3,7 @@ package com.checkmate.matches.controller;
 import com.checkmate.matches.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.checkmate.matches.model.dto.requests.createMatchRequestDTO;
+import com.checkmate.matches.model.dto.responses.DrawResponseDTO;
 import com.checkmate.matches.model.dto.responses.MatchResponseDTO;
 import com.checkmate.matches.model.entity.Match;
 import com.checkmate.matches.repository.MatchRepository;
@@ -165,11 +166,12 @@ public class MatchController {
 
     @PostMapping("/respondToDrawRequest")
     @RequiresJWT
-    public ResponseEntity<?> respondToDrawRequest(@RequestParam("matchId") String matchId, @RequestParam("response") boolean response, HttpServletRequest request)
+    public ResponseEntity<?> respondToDrawRequest(HttpServletRequest request, @RequestBody DrawResponseDTO drawResponseDTO)
     {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
 
-        boolean attempt = matchService.drawResponse(Long.parseLong(matchId), decodedJWT.getClaim("userId").asLong(), response);
+        boolean attempt = matchService.drawResponse(drawResponseDTO.getMatchId(), decodedJWT.getClaim("userId").asLong(), drawResponseDTO.isResponse());
+
 
         if (!attempt) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request.");

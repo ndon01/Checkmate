@@ -237,7 +237,7 @@ public class MatchService {
         Match thisMatch = optionalMatch.get();
 
         // is user in match
-        if (thisMatch.getWhiteUserId() != userId && thisMatch.getBlackUserId() != userId) {
+        if (thisMatch.getWhiteUserId() != userId || thisMatch.getBlackUserId() != userId) {
             return false;
         }
 
