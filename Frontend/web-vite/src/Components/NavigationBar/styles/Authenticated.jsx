@@ -82,7 +82,8 @@ function Authenticated() {
                                 }}/>
                                 <span style={{
                                     color: "black",
-                                    fontSize: "18px"
+                                    fontSize: "18px",
+                                    marginLeft: "5px"
                                 }}>
                                     {currentUser?.coins || 0}</span>
                             </Box>
