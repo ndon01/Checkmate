@@ -11,6 +11,13 @@ import java.util.UUID;
 @Configuration
 public class RabbitMqConfig {
 
+    public static final String USER_EVENTS_EXCHANGE = "user_events_exchange";
+
+    @Bean
+    public FanoutExchange userEventsExchange() {
+        return new FanoutExchange(USER_EVENTS_EXCHANGE);
+    }
+
     public static final String MATCHES_MATCH_EVENT_QUEUE = "matches_match_event_queue";
     public static final String MATCH_EVENT_EXCHANGE = "match_event_exchange";
 

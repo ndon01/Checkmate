@@ -22,5 +22,9 @@ public class RabbitMqController {
             System.out.println("Received registration event for user: " + event.getAdditionalDetails().get("username"));
             userService.registerUser(event.getUserId(), event.getAdditionalDetails().get("username"));
         }
+
+        // Event Type is Remove Tokens
+
+        // Event Type is Add Tokens
     }
 }

@@ -34,7 +34,6 @@ const UserProfile = () => {
         follower: false, // client is following user
 
         ownProfile: false,
-
     });
 
     useEffect(() => {
@@ -208,6 +207,7 @@ const UserProfile = () => {
 
     return (
         <>
+
             <NavigationBar/>
             <MainArea>
                 {/* First Section */}
@@ -217,7 +217,6 @@ const UserProfile = () => {
                 }}>
 
                     <div style={{height: '50px'}}></div>
-
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',

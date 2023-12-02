@@ -18,7 +18,7 @@ const token = localStorage.getItem("access_token")
 const WS_URL = `ws://localhost:8080/api/matchmaking/ws?token=${token}`
 
 
-function Play() {
+function Queue() {
     const [selectedType, setSelectedType] = useState('');
     const [searchingForMatch, setSearchingForMatch] = useState(false);
     const [confirmMatchDetails, setConfirmMatchDetails] = useState(null);
@@ -171,44 +171,44 @@ function Play() {
         <>
             <NavigationBar/>
             <MainArea>
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        padding: 20,
-                        height: "100%"
-                    }}>
-                        <h1>Chess Matchmaking</h1>
-                        <br/><br/>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: 20,
+                    height: "100%"
+                }}>
+                    <h1>Chess Matchmaking</h1>
+                    <br/><br/>
 
-                        {searchingForMatch && confirmMatchDetails == null ? (<>
-                            <CircularProgress/>
-                            <br/>
-                            Searching for a match
-                            <br/>
-                            Time Elapsed: {formatTime(elapsedTime)}
-                            <br/>
-                            <Button variant="contained" color="primary" style={{margin: 10}} onClick={leaveQueue}>
-                                Leave Queue
-                            </Button>
-                        </>) : (<>
+                    {searchingForMatch && confirmMatchDetails == null ? (<>
+                        <CircularProgress/>
+                        <br/>
+                        Searching for a match
+                        <br/>
+                        Time Elapsed: {formatTime(elapsedTime)}
+                        <br/>
+                        <Button variant="contained" color="primary" style={{margin: 10}} onClick={leaveQueue}>
+                            Leave Queue
+                        </Button>
+                    </>) : (<>
+                        <Button variant="contained" color="primary" style={{margin: 10}} onClick={startQueue}>
+                            Enter Queue
+                        </Button>
+                    </>)}
+
+                    {confirmMatchDetails != null ? (
+                        <>
                             <Button variant="contained" color="primary" style={{margin: 10}} onClick={startQueue}>
                                 Enter Queue
                             </Button>
-                        </>)}
+                        </>
+                    ) : null}
 
-                        {confirmMatchDetails != null ? (
-                            <>
-                                <Button variant="contained" color="primary" style={{margin: 10}} onClick={startQueue}>
-                                    Enter Queue
-                                </Button>
-                            </>
-                        ) : null}
-
-                    </div>
+                </div>
             </MainArea>
         </>
     );
 }
 
-export default Play;
+export default Queue;

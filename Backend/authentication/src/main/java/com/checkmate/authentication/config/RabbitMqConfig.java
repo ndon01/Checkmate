@@ -12,14 +12,15 @@ public class RabbitMqConfig {
     public static final String USER_EVENTS_EXCHANGE = "user_events_exchange";
 
     @Bean
+    public FanoutExchange userEventsExchange() {
+        return new FanoutExchange(USER_EVENTS_EXCHANGE);
+    }
+
+    @Bean
     public Queue verificationEmailQueue() {
         return new Queue(VERIFICATION_QUEUE);
     }
 
-    @Bean
-    public FanoutExchange userEventsExchange() {
-        return new FanoutExchange(USER_EVENTS_EXCHANGE);
-    }
 
     @Bean
     public Binding binding(Queue verificationEmailQueue, FanoutExchange userEventsExchange) {
