@@ -45,4 +45,7 @@ public class UserCredential {
     @Column(name= "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "last_login")
+    private LocalDateTime updatedAt;
+
 }

@@ -11,6 +11,7 @@ import {
 import {Link, useNavigate} from "react-router-dom";
 import imgUrl from '@/Assets/CheckmateLogo.png';
 import {useUser} from "@/Contexts/UserContext.jsx";
+import {MonetizationOn} from "@mui/icons-material";
 
 function Authenticated() {
     const navigate = useNavigate();
@@ -62,6 +63,29 @@ function Authenticated() {
 
                     <div style={{ position: 'absolute', right: '25px' }}>
                         <IconButton onClick={handleClick}>
+                            <Box style={{
+                                backgroundColor: "white",
+                                borderRadius: "10px",
+                                marginRight: "10px",
+
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+
+                                paddingBlock: "5px",
+                                paddingInline: "10px",
+
+
+                            }}>
+                                <MonetizationOn style={{
+                                    color: "rgba(91,134,88,0.54)",
+                                }}/>
+                                <span style={{
+                                    color: "black",
+                                    fontSize: "18px"
+                                }}>
+                                    {currentUser?.coins || 0}</span>
+                            </Box>
                             <Box
                                 style={{
                                     width: "32px", height: "32px", backgroundColor: "white",

@@ -55,7 +55,6 @@ public class TokenController {
             return ResponseEntity.status(409).body(err);
         }
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
-
         // login attempt will return credentials
         // create response entity
 
@@ -113,3 +112,4 @@ public class TokenController {
         return ResponseEntity.ok().body(refreshResponseDTO);
     }
 }
+
