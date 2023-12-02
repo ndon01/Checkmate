@@ -71,6 +71,27 @@ public class MatchService {
         matchRepository.save(newMatch);
     }
 
+    public void createMatch(Long User1Id, Long User2Id, double ante) {
+        logger.info("Creating match between " + User1Id + " and " + User2Id + "for " + ante);
+
+        // randomly pick if user1 or user2 is white
+        boolean user1IsWhite = Math.random() < 0.5;
+
+        // create match object
+        Match newMatch = new Match();
+        newMatch.setWhiteUserId(user1IsWhite ? User1Id : User2Id);
+        newMatch.setBlackUserId(user1IsWhite ? User2Id : User1Id);
+
+        newMatch.setMatchType(Match.MatchType.BLITZ);
+
+        newMatch.setWhiteTimeLeft(5 * 60L);
+        newMatch.setBlackTimeLeft(5 * 60L);
+        newMatch.setAnte(ante);
+
+
+        matchRepository.save(newMatch);
+    }
+
     public Match pingMatch(long matchId, long userId) {
         Optional<Match> optionalMatch = matchRepository.findById(matchId);
         // match doesnt exist
