@@ -18,6 +18,9 @@ public class Match {
     @Column(name = "match_start_time")
     private Long matchStartTime;
 
+    @Column(name = "Ante")
+    private double ante;
+
     @Column(name = "match_end_time")
     private Long matchEndTime;
 

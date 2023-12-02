@@ -42,6 +42,7 @@ public class ClientController {
         userContextResponseDTO.setUserId(user.getUserId());
         userContextResponseDTO.setUsername(user.getUsername());
         userContextResponseDTO.setDisplayName(user.getDisplayName());
+        userContextResponseDTO.setCoins(user.getCoinTotal());
 
         return ResponseEntity.ok().body(userContextResponseDTO);
     }

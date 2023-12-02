@@ -6,10 +6,13 @@ import com.checkmate.matches.controller.MatchController;
 import com.checkmate.matches.model.entity.Match;
 import com.checkmate.matches.model.rabbitmq.MatchEventDTO;
 import com.checkmate.matches.model.rabbitmq.MatchEventType;
+import com.checkmate.matches.model.rabbitmq.UserEventDTO;
+import com.checkmate.matches.model.rabbitmq.UserEventType;
 import com.checkmate.matches.model.util.Game.Game;
 import com.checkmate.matches.model.util.Game.Move;
 import com.checkmate.matches.repository.MatchRepository;
 import com.checkmate.matches.*;
+import com.checkmate.users.model.entity.User;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,23 +121,36 @@ public class MatchService {
     public void finishMatch(Match match) {
         // post to rabbitmq
         //before finishing the match transfer coins
-        /*
-        long winnerID = match.getWinnerID();
-        long loserID;
-        if(winnerID == match.getWhiteUserID())
-        {
-            loserID = match.getBlackUserID();
-        }
-        else{ loserID = match.getWhiteUserID();}
-        Optional<User> optionalUser = userRepository.findUserbyUserID(winnerID);
-        User winner = optionalUser.get();
-        User loser = userRepository.findUserbyUserID(loserID).get();
 
-        winner.setCoins(winner.getCoins() + 100);
-        userRepository.saveAndFlush(winner);
-        loser.setCoins(loser.getCoins() -100);
-        userRepository.saveAndFlush(loser);
-        * */
+       if(match.getAnte() > 0 && !match.isDraw())
+       {
+           double ante = match.getAnte();
+           long winnerID = match.getWinnerUserId();
+           long loserID;
+           if(winnerID == match.getWhiteUserId())
+           {
+               loserID = match.getBlackUserId();
+           }
+           else
+           {
+               loserID = match.getWhiteUserId();
+           }
+           UserEventDTO winnerUpdate = new UserEventDTO();
+           winnerUpdate.setEventType(UserEventType.ADD_USER_COINS);
+           winnerUpdate.setUserId(winnerID);
+           winnerUpdate.addAdditionalDetails("amount", Double.toString(ante));
+
+           rabbitTemplate.convertAndSend(RabbitMqConfig.USER_EVENTS_EXCHANGE, "", winnerUpdate);
+
+           UserEventDTO loserUpdate = new UserEventDTO();
+           loserUpdate.setEventType(UserEventType.REMOVE_USER_COINS);
+           loserUpdate.setUserId(loserID);
+           loserUpdate.addAdditionalDetails("amount", Double.toString(ante));
+
+           rabbitTemplate.convertAndSend(loserUpdate);
+
+       }
+
 
 
         MatchEventDTO matchEventDTO = new MatchEventDTO();

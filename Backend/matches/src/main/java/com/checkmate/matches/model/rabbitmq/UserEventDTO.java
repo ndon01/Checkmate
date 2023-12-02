@@ -21,4 +21,6 @@ public class UserEventDTO {
     public void addAdditionalDetails(String key, String value) {
         this.additionalDetails.put(key, value);
     }
+
+    public String getAdditionalDetail(String key){return this.additionalDetails.get(key);}
 }

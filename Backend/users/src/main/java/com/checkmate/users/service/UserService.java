@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -58,5 +59,40 @@ public class UserService {
 
     public List<User> searchForUser(String searchQuery) {
         return userRepository.findUserByUsernameContainingIgnoreCase(searchQuery);
+    }
+
+    public void addCoins(long userID, double ante)
+    {
+        Optional<User> optionalWinner = userRepository.findByCredentialId(userID);
+        if(optionalWinner.isEmpty())
+        {
+            return;
+        }
+
+        User winner = optionalWinner.get();
+        winner.setCoinTotal(winner.getCoinTotal() + ante);
+
+        userRepository.save(winner);
+
+    }
+
+    public void removeCoins(long userID, double ante)
+    {
+        Optional<User> optionalLoser = userRepository.findByCredentialId(userID);
+        if(optionalLoser.isEmpty())
+        {
+            return;
+        }
+
+        User loser = optionalLoser.get();
+        loser.setCoinTotal(loser.getCoinTotal() - ante);
+
+        if(loser.getCoinTotal() <= 0)
+        {
+            loser.setCoinTotal(0);
+        }
+
+        userRepository.save(loser);
+
     }
 }

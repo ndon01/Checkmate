@@ -2,6 +2,9 @@ package com.checkmate.matches.model.rabbitmq;
 
 public enum UserEventType {
     USER_REGISTRATION,
+    REMOVE_USER_COINS,
+    ADD_USER_COINS,
+
     USER_LOGIN,
     USER_LOGOUT,
     PROFILE_UPDATE,

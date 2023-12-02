@@ -8,5 +8,6 @@ public class UserContextResponseDTO {
     private long userId;
     private String username;
     private String displayName;
+    private Double coins;
 
 }
