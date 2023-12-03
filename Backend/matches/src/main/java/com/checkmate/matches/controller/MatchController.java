@@ -164,14 +164,14 @@ public class MatchController {
 
     }
 
-    @PostMapping("/respondToDrawRequest")
+    // accept draw
+    @PostMapping("/acceptDraw")
     @RequiresJWT
-    public ResponseEntity<?> respondToDrawRequest(HttpServletRequest request, @RequestBody DrawResponseDTO drawResponseDTO)
+    public ResponseEntity<?> acceptDraw(@RequestParam("matchId") String matchId, HttpServletRequest request)
     {
         DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
 
-        boolean attempt = matchService.drawResponse(drawResponseDTO.getMatchId(), decodedJWT.getClaim("userId").asLong(), drawResponseDTO.isResponse());
-
+        boolean attempt = matchService.acceptDraw(Long.parseLong(matchId), decodedJWT.getClaim("userId").asLong());
 
         if (!attempt) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request.");
@@ -180,5 +180,23 @@ public class MatchController {
         return ResponseEntity.ok("Draw request response received.");
 
     }
+
+    // decline draw
+    @PostMapping("/declineDraw")
+    @RequiresJWT
+    public ResponseEntity<?> declineDraw(@RequestParam("matchId") String matchId, HttpServletRequest request)
+    {
+        DecodedJWT decodedJWT = (DecodedJWT) request.getAttribute("decodedJWT");
+
+        boolean attempt = matchService.declineDraw(Long.parseLong(matchId), decodedJWT.getClaim("userId").asLong());
+
+        if (!attempt) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request.");
+        }
+
+        return ResponseEntity.ok("Draw request response received.");
+
+    }
+
 
 }

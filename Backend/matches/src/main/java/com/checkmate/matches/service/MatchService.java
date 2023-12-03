@@ -12,7 +12,6 @@ import com.checkmate.matches.model.util.Game.Game;
 import com.checkmate.matches.model.util.Game.Move;
 import com.checkmate.matches.repository.MatchRepository;
 import com.checkmate.matches.*;
-import com.checkmate.users.model.entity.User;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +90,8 @@ public class MatchService {
 
         matchRepository.save(newMatch);
     }
+
+
 
     public Match pingMatch(long matchId, long userId) {
         Optional<Match> optionalMatch = matchRepository.findById(matchId);
@@ -228,6 +229,63 @@ public class MatchService {
         return true;
     }
 
+    public boolean acceptDraw(long matchId, long userId) {
+        Optional<Match> optionalMatch = matchRepository.findMatchByMatchId(matchId);
+        if (optionalMatch.isEmpty()) {
+            return false;
+        }
+
+        Match thisMatch = optionalMatch.get();
+
+        // is user in match
+        if (thisMatch.getWhiteUserId() != userId || thisMatch.getBlackUserId() != userId) {
+            return false;
+        }
+
+        if (!thisMatch.isDrawRequested()) {
+            return false;
+        }
+
+        if (thisMatch.getDrawRequesterId() == userId) {
+            return false;
+        }
+
+        thisMatch.setDraw(true);
+        thisMatch.setFinished(true);
+        thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
+        matchRepository.saveAndFlush(thisMatch);
+        finishMatch(thisMatch);
+
+        return true;
+    }
+
+    public boolean declineDraw(long matchId, long userId) {
+        Optional<Match> optionalMatch = matchRepository.findMatchByMatchId(matchId);
+        if (optionalMatch.isEmpty()) {
+            return false;
+        }
+
+        Match thisMatch = optionalMatch.get();
+
+        // is user in match
+        if (thisMatch.getWhiteUserId() != userId || thisMatch.getBlackUserId() != userId) {
+            return false;
+        }
+
+        if (!thisMatch.isDrawRequested()) {
+            return false;
+        }
+
+        if (thisMatch.getDrawRequesterId() == userId) {
+            return false;
+        }
+
+        thisMatch.setDrawRequested(false);
+        thisMatch.setDrawRequesterId(null);
+        matchRepository.saveAndFlush(thisMatch);
+        return true;
+    }
+
     public boolean drawResponse(long matchId, long userId, boolean response) {
         Optional<Match> optionalMatch = matchRepository.findActiveMatchByUserId(matchId);
         if (optionalMatch.isEmpty()) {
@@ -244,9 +302,11 @@ public class MatchService {
         if (!thisMatch.isDrawRequested()) {
             return false;
         }
-        if (thisMatch.getDrawRequesterId() != userId) {
+
+        if (thisMatch.getDrawRequesterId() == userId) {
             return false;
         }
+
         if (!response) {
             thisMatch.setDrawRequested(false);
             thisMatch.setDrawRequesterId(null);
@@ -259,6 +319,7 @@ public class MatchService {
         thisMatch.setMatchStatus(Match.MatchStatus.FINISHED);
         matchRepository.saveAndFlush(thisMatch);
         finishMatch(thisMatch);
+
         return true;
 
     }

@@ -41,7 +41,7 @@ export default function SearchComponent() {
         setError('');
         setSearched(true);
         try {
-            // Replace '/your-api-endpoint' with the actual endpoint provided by your backend
+            // fetches from the server
             const response = await fetch(`http://localhost:8080/api/users/searchForUsers?searchQuery=${encodeURIComponent(query)}`, {
                 method: "GET"
             }).then(function(response) {
@@ -69,6 +69,7 @@ export default function SearchComponent() {
             <MainArea>
                 <div style={{minWidth: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                         <form onSubmit={handleSubmit} style={{marginTop: '2rem'}}>
+                            {/* Search In */}
                             <FormControl fullWidth margin="normal">
                                 <InputLabel id="specifier-label">Search In</InputLabel>
                                 <Select
@@ -82,6 +83,8 @@ export default function SearchComponent() {
                                     <MenuItem value="matches">Matches</MenuItem>
                                 </Select>
                             </FormControl>
+
+                            {/* Search Query */}
                             <TextField
                                 fullWidth
                                 id="search-query"
@@ -90,6 +93,8 @@ export default function SearchComponent() {
                                 value={query}
                                 onChange={handleQueryChange}
                             />
+
+                            {/* Search Button */}
                             <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
                                 {loading ? <CircularProgress size={24} /> : 'Search'}
                             </Button>
@@ -111,6 +116,8 @@ export default function SearchComponent() {
                                 marginTop: '25px',
                                 minHeight: '100%'
                             }}>
+
+                                {/* list of users */}
                                 {results.map((result, index) => (
                                     <ListItem key={index} style={{
                                         display: 'flex',

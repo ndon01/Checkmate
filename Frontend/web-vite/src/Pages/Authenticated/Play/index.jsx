@@ -196,7 +196,6 @@ function Queue() {
                             Enter Queue
                         </Button>
                     </>)}
-
                     {confirmMatchDetails != null ? (
                         <>
                             <Button variant="contained" color="primary" style={{margin: 10}} onClick={startQueue}>

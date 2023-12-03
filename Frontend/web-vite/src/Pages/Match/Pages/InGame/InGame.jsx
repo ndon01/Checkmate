@@ -393,28 +393,41 @@ export const InGame = ({
     }
 
     function acceptDraw() {
-        fetch(`http://localhost:8080/api/matches/respondToDrawRequest?matchId=${matchData.matchId}&response=${true}`, {
+        fetch(`http://localhost:8080/api/matches/acceptDraw?matchId=${matchData.matchId}`, {
             method: "POST",
             headers: {
                 Authorization: "Bearer " + localStorage.getItem("access_token"),
+
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log("Draw accepted successfully!")
             }
         })
     }
 
     function denyDraw() {
-        fetch(`http://localhost:8080/api/matches/respondToDrawRequest?matchId=${matchData.matchId}&response=${false}`, {
+        fetch(`http://localhost:8080/api/matches/declineDraw?matchId=${matchData.matchId}`, {
             method: "POST",
             headers: {
                 Authorization: "Bearer " + localStorage.getItem("access_token"),
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log("Draw denied successfully!")
             }
         })
     }
 
     function resignMatch() {
-        fetch(`http://localhost:8080/api/matches/respondToDrawRequest?matchId=${matchData.matchId}&response=${true}`, {
+        fetch(`http://localhost:8080/api/matches/resignMatch?matchId=${matchData.matchId}`, {
             method: "POST",
             headers: {
                 Authorization: "Bearer " + localStorage.getItem("access_token"),
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log("Match resigned successfully!")
             }
         })
     }

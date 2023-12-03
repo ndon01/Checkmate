@@ -54,6 +54,8 @@ public class UsersController {
         return "API is up and running!";
     }
 
+
+    // REST API get mapping for /searchForUsers
     @GetMapping("/searchForUsers")
     public List<UserSearchResultDTO> searchForUsers(@RequestParam("searchQuery") String searchQuery) {
         List<User> userList = userService.searchForUser(searchQuery);
